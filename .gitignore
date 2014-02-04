@@ -1,0 +1,12 @@
+# backup files
+**~
+**.bak
+
+# settings files
+Settings.php
+Settings_bak.php
+
+# things that change
+attachments/
+avatars/
+cache/

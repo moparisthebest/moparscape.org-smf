@@ -145,4 +145,33 @@ $txt['themeadmin_edit_preview'] = 'Preview';
 $txt['themeadmin_selectable'] = 'Themes that the user is able to select';
 $txt['themeadmin_themelist_link'] = 'Show the list of themes';
 
+$txt['geshi_code_container'] = 'GeSHi Code Container';
+$txt['geshi_code_container_desc'] = 'For reference please see <a href="http://qbnz.com/highlighter/geshi-doc.html#the-code-container" target="_blank">3.1 The Code Container</a>.';
+$txt['geshi_line_numbers'] = 'Line numbers';
+$txt['geshi_line_numbers_desc'] = 'For reference please see <a href="http://qbnz.com/highlighter/geshi-doc.html#line-numbers" target="_blank">3.2 Line Numbers</a>.';
+$txt['geshi_fancy_line_number'] = 'Fancy line numbers';
+$txt['geshi_fancy_line_number_desc'] = 'For reference please see <a href="http://qbnz.com/highlighter/geshi-doc.html#line-numbers" target="_blank">3.2 Line Numbers</a>.';
+$txt['geshi_line_style'] = 'Line style';
+$txt['geshi_line_style_desc'] = 'For reference please see <a href="http://qbnz.com/highlighter/geshi-doc.html#styling-line-numbers" target="_blank">3.2.2 Styling Line Numbers</a>.';
+$txt['geshi_line_style_fancy'] = 'Fancy line style';
+$txt['geshi_line_style_fancy_desc'] = 'For reference please see <a href="http://qbnz.com/highlighter/geshi-doc.html#styling-line-numbers" target="_blank">3.2.2 Styling Line Numbers</a>.';
+$txt['geshi_highlight_lines_extra_style'] = 'Highlighted lines style';
+$txt['geshi_highlight_lines_extra_style_desc'] = 'For reference please see <a href="http://qbnz.com/highlighter/geshi-doc.html#styles-for-highlighted-lines" target="_blank">3.15.2 Styles for the Highlighted Lines</a>.';
+$txt['geshi_enable_pre_header'] = 'Show header above GeSHi Code Container';
+$txt['geshi_enable_pre_header_desc'] = '';
+$txt['geshi_pre_header'] = 'Header above GeSHi Code Container';
+$txt['geshi_pre_header_desc'] = 'You can use {CODE}, {TAG} and {LANGUAGE} keywords. For reference please see <a href="http://codebirth.com/index.php?topic=81.0" target="_blank">cb|GeSHi-mod help</a>.';
+$txt['geshi_enable_header'] = 'Show header inside GeSHi Code Container';
+$txt['geshi_enable_header_desc'] = '';
+$txt['geshi_header'] = 'Header inside GeSHi Code Container';
+$txt['geshi_header_desc'] = 'You can use <a href="http://qbnz.com/highlighter/geshi-doc.html#keyword-substitution" target="_blank">these keywords</a>. For reference please see <a href="http://qbnz.com/highlighter/geshi-doc.html#setting-header-content" target="_blank">3.12.2 Setting Header Content</a>.';
+$txt['geshi_enable_footer'] = 'Show footer inside GeSHi Code Container';
+$txt['geshi_enable_footer_desc'] = '';
+$txt['geshi_footer'] = 'Footer inside GeSHi Code Container';
+$txt['geshi_footer_desc'] = 'You can use <a href="http://qbnz.com/highlighter/geshi-doc.html#keyword-substitution" target="_blank">these keywords</a>. For reference please see <a href="http://qbnz.com/highlighter/geshi-doc.html#setting-footer-content" target="_blank">3.12.3 Setting Footer Content</a>.';
+$txt['geshi_enable_language_selector'] = 'Show language selector';
+$txt['geshi_enable_language_selector_desc'] = 'For reference please see <a href="http://codebirth.com/index.php?topic=81.0" target="_blank">cb|GeSHi-mod help</a>.';
+$txt['geshi_language_selector'] = 'Selectable languages';
+$txt['geshi_language_selector_desc'] = 'For reference please see <a href="http://codebirth.com/index.php?topic=81.0" target="_blank">cb|GeSHi-mod help</a>.';
+
 ?>

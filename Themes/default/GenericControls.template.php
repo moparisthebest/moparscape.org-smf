@@ -206,6 +206,25 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 									\'white\': ', JavaScriptEscape($txt['white']), '
 								}
 							}';
+
+
+					if ($settings['geshi_enable_language_selector']) {
+						$arrGLanguages = explode(',', $settings['geshi_language_selector']);
+						echo ',
+							{
+								sType: \'select\',
+								sName: \'sel_code\',
+								oOptions: {
+									\'\': ', JavaScriptEscape($txt['code']);
+						foreach ($arrGLanguages as $gLang) {
+							list($glCode, $glName) = explode(':', $gLang);
+							echo ',
+									\''. $glCode .'\': ', JavaScriptEscape($glName);
+						}
+						echo '
+								}
+							}';
+					}
 				}
 				echo '
 						]', $i == count($context['bbc_tags']) - 1 ? '' : ',';

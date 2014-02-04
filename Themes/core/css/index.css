@@ -3521,3 +3521,22 @@ ul.nolist li
 		border: none;
 	}
 }
+.geshi {
+	color: #000000;
+	background: #ffffff;
+	font-family: monospace;
+	font-size: 13px;
+	line-height: 18px;
+	border: 1px solid #aaaaaa;
+	margin: 1px auto 1px auto;
+	width: 99%;
+	white-space:normal;
+	white-space: pre;
+	white-space: pre-wrap;
+	white-space: -moz-pre-wrap;
+	white-space: -pre-wrap;
+	white-space: -o-pre-wrap;
+	word-wrap: break-word;
+	overflow: auto;
+	max-height: 306px;
+}

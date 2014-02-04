@@ -1122,43 +1122,69 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'code',
 				'type' => 'unparsed_equals_content',
-				'content' => '<div class="codeheader">' . $txt['code'] . ': ($2) <a href="#" onclick="return smfSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div>' . ($context['browser']['is_gecko'] || $context['browser']['is_opera'] ? '<pre style="margin: 0; padding: 0;">' : '') . '<code class="bbc_code">$1</code>' . ($context['browser']['is_gecko'] || $context['browser']['is_opera'] ? '</pre>' : ''),
+				'content' => '$1',
 				// !!! Maybe this can be simplified?
 				'validate' => isset($disabled['code']) ? null : create_function('&$tag, &$data, $disabled', '
-					global $context;
+					global $sourcedir, $settings, $txt;
 
-					if (!isset($disabled[\'code\']))
-					{
-						$php_parts = preg_split(\'~(&lt;\?php|\?&gt;)~\', $data[0], -1, PREG_SPLIT_DELIM_CAPTURE);
+					$data[0] = strtr($data[0], array(
+						\'&#91;]\'			=> \'[]\', 
+						\'&#91;&#039;\'		=> \'[&#039;\', 
+						\'<br />\'			=> "\n",
+						)
+					);
+					$data[0] = un_htmlspecialchars($data[0]);
+					$data[1] = explode(\',\', $data[1]);
 
-						for ($php_i = 0, $php_n = count($php_parts); $php_i < $php_n; $php_i++)
-						{
-							// Do PHP code coloring?
-							if ($php_parts[$php_i] != \'&lt;?php\')
-								continue;
+					if (strpos($data[1][0], \'.\')) {
+						list($lang, $start_number) = explode(\'.\', $data[1][0]);
+					} else {
+						$lang = $data[1][0];
+						$start_number = 1;
+					}
 
-							$php_string = \'\';
-							while ($php_i + 1 < count($php_parts) && $php_parts[$php_i] != \'?&gt;\')
-							{
-								$php_string .= $php_parts[$php_i];
-								$php_parts[$php_i++] = \'\';
-							}
-							$php_parts[$php_i] = highlight_php_code($php_string . $php_parts[$php_i]);
-						}
+					if (!is_numeric($start_number))
+						$start_number = 1;
 
-						// Fix the PHP code stuff...
-						$data[0] = str_replace("<pre style=\"display: inline;\">\t</pre>", "\t", implode(\'\', $php_parts));
+					include_once($sourcedir . \'/geshi.php\');
 
-						// Older browsers are annoying, aren\'t they?
-						if ($context[\'browser\'][\'is_ie4\'] || $context[\'browser\'][\'is_ie5\'] || $context[\'browser\'][\'is_ie5.5\'])
-							$data[0] = str_replace("\t", "<pre style=\"display: inline;\">\t</pre>", $data[0]);
-						else
-							$data[0] = str_replace("\t", "<span style=\"white-space: pre;\">\t</span>", $data[0]);
+					$geshi = new Geshi($data[0], $lang);
+					if ($geshi->error()) {
+						$lang = "text";
+						$geshi->set_language($lang, true);
+					}
+                    $geshi->set_overall_class(\'geshi\');
 
-						// Recent Opera bug requiring temporary fix. &nsbp; is needed before </code> to avoid broken selection.
-						if ($context[\'browser\'][\'is_opera\'])
-							$data[0] .= \'&nbsp;\';
-					}'),
+					$geshi->start_line_numbers_at($start_number);
+
+                    if(count($data[1]) > 1) {
+                    	array_filter($data[1], \'is_numeric\');
+                    	if (strlen(trim($settings[\'geshi_highlight_lines_extra_style\'])))
+							$geshi->set_highlight_lines_extra_style($settings[\'geshi_highlight_lines_extra_style\']);
+                    	$geshi->highlight_lines_extra($data[1]);
+                    }
+
+                    $geshi->set_overall_class(\'geshi\');
+					$geshi->set_header_type($settings[\'geshi_code_container\']);
+
+                    $geshi->enable_line_numbers($settings[\'geshi_line_numbers\'], $settings[\'geshi_fancy_line_number\']);
+                    $geshi->set_line_style($settings[\'geshi_line_style\'], $settings[\'geshi_line_style_fancy\']);
+
+					$pre_header = "";
+					if ($settings[\'geshi_enable_pre_header\']) {
+						$pre_header = \'<div class="codeheader">\' . str_replace(array("{CODE}", "{TAG}", "{LANGUAGE}"), array($txt[\'code\'], strtoupper($lang), $geshi->get_language_name()), $settings[\'geshi_pre_header\']) . "</div>";
+					}
+
+                    if ($settings[\'geshi_enable_header\']) {
+                        $geshi->set_header_content($settings[\'geshi_header\']);
+					}
+					
+                    if ($settings[\'geshi_enable_footer\']) {
+                        $geshi->set_footer_content($settings[\'geshi_footer\']);
+                    }
+
+					$data[0] = $pre_header . str_replace("\n", "", $geshi->parse_code());
+				'),
 				'block_level' => true,
 			),
 			array(
@@ -2291,6 +2317,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			// Validation for my parking, please!
 			if (isset($tag['validate']))
 				$tag['validate']($tag, $data, $disabled);
+
+			if(is_array($data[1]))
+				$data[1] = array_shift($data[1]);
 
 			$code = strtr($tag['content'], array('$1' => $data[0], '$2' => $data[1]));
 			$message = substr($message, 0, $pos) . "\n" . $code . "\n" . substr($message, $pos3 + 3 + strlen($tag['tag']));

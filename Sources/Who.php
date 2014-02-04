@@ -728,6 +728,8 @@ function Credits($in_admin = false)
 				$txt['some_mod_copyright'],
 		*/
 		'mods' => array(
+
+			'cb|GeSHi-mod &copy; 2011, <a href="http://codebirth.com">codebirth</a>',
 		),
 	);
 

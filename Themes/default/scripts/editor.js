@@ -780,6 +780,16 @@ smc_Editor.prototype.handleSelectChange = function (oSelectProperties)
 			this.smf_execCommand('forecolor', false, sValue);
 	}
 
+	else if (oSelectProperties.sName == 'sel_code')
+	{
+		// Are we in boring mode?
+		if (!this.bRichTextEnabled)
+		{
+			surroundText('[code=' + sValue + ']', '[/code]', this.oTextHandle);
+			oSelectProperties.oSelect.selectedIndex = 0;
+		}
+	}
+
 	this.updateEditorControls();
 
 	return true;

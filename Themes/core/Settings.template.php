@@ -266,6 +266,108 @@ function template_settings()
 			'id' => 'additional_options_collapsable',
 			'label' => $txt['additional_options_collapsable'],
 		),
+
+	'',
+		array(
+			'id' => 'geshi_code_container',
+			'label' => $txt['geshi_code_container'],
+			'description' => $txt['geshi_code_container_desc'],
+			'options' => array(
+				0 => 'GESHI_HEADER_NONE',
+				1 => 'GESHI_HEADER_DIV',
+				2 => 'GESHI_HEADER_PRE',
+				3 => 'GESHI_HEADER_PRE_VALID',
+				4 => 'GESHI_HEADER_PRE_TABLE',
+			),
+			'type' => 'number',
+		),
+		array(
+			'id' => 'geshi_line_numbers',
+			'label' => $txt['geshi_line_numbers'],
+			'description' => $txt['geshi_line_numbers_desc'],
+			'options' => array(
+				0 => 'GESHI_NO_LINE_NUMBERS',
+				1 => 'GESHI_NORMAL_LINE_NUMBERS',
+				2 => 'GESHI_FANCY_LINE_NUMBERS',
+			),
+			'type' => 'number',
+		),
+		array(
+			'id' => 'geshi_fancy_line_number',
+			'label' => $txt['geshi_fancy_line_number'],
+			'description' => $txt['geshi_fancy_line_number_desc'],
+			'type' => 'number',
+			'size' => 2,
+		),
+		array(
+			'id' => 'geshi_line_style',
+			'label' => $txt['geshi_line_style'],
+			'description' => $txt['geshi_line_style_desc'],
+			'type' => 'text',
+			'size' => 50,
+		),
+		array(
+			'id' => 'geshi_line_style_fancy',
+			'label' => $txt['geshi_line_style_fancy'],
+			'description' => $txt['geshi_line_style_fancy_desc'],
+			'type' => 'text',
+			'size' => 50,
+		),
+		array(
+			'id' => 'geshi_highlight_lines_extra_style',
+			'label' => $txt['geshi_highlight_lines_extra_style'],
+			'description' => $txt['geshi_highlight_lines_extra_style_desc'],
+			'type' => 'text',
+			'size' => 50,
+		),
+		array(
+			'id' => 'geshi_enable_pre_header',
+			'label' => $txt['geshi_enable_pre_header'],
+			'description' => $txt['geshi_enable_pre_header_desc'],
+		),
+		array(
+			'id' => 'geshi_pre_header',
+			'label' => $txt['geshi_pre_header'],
+			'description' => $txt['geshi_pre_header_desc'],
+			'type' => 'text',
+			'size' => 50,
+		),
+		array(
+			'id' => 'geshi_enable_header',
+			'label' => $txt['geshi_enable_header'],
+			'description' => $txt['geshi_enable_header_desc'],
+		),
+		array(
+			'id' => 'geshi_header',
+			'label' => $txt['geshi_header'],
+			'description' => $txt['geshi_header_desc'],
+			'type' => 'text',
+			'size' => 50,
+		),
+		array(
+			'id' => 'geshi_enable_footer',
+			'label' => $txt['geshi_enable_footer'],
+			'description' => $txt['geshi_enable_footer_desc'],
+		),
+		array(
+			'id' => 'geshi_footer',
+			'label' => $txt['geshi_footer'],
+			'description' => $txt['geshi_footer_desc'],
+			'type' => 'text',
+			'size' => 50,
+		),
+		array(
+			'id' => 'geshi_enable_language_selector',
+			'label' => $txt['geshi_enable_language_selector'],
+			'description' => $txt['geshi_enable_language_selector_desc'],
+		),
+		array(
+			'id' => 'geshi_language_selector',
+			'label' => $txt['geshi_language_selector'],
+			'description' => $txt['geshi_language_selector_desc'],
+			'type' => 'text',
+			'size' => 50,
+		),
 	);
 }
 

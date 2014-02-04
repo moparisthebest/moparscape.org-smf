@@ -1611,6 +1611,18 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'disabled_after' => ' ($1)',
 			),
 			array(
+				'tag' => 'youtube',
+				'type' => 'unparsed_content',
+				'content' => '<iframe style="border:0;" width="642" height="392" src="http://www.youtube.com/embed/$1" allowfullscreen></iframe>',
+				'validate' => create_function('&$tag, &$data, $disabled', '
+				if (isset($disabled[\'url\']))
+					$tag[\'content\'] = \'http://www.youtube.com/watch?v=$1\';
+				$pattern = \'~(?:http|https|)(?::\/\/|)(?:www.|)(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/ytscreeningroom\?v=|\/feeds\/api\/videos\/|\/user\S*[^\w\-\s]|\S*[^\w\-\s]))([\w\-]{11})[a-z0-9;:@?&%=+\/\$_.-]*~i\';
+				if (preg_match($pattern, $data, $matches))
+					$data = $matches[1];'),
+				'disabled_content' => 'http://www.youtube.com/watch?v=$1',
+			),
+			array(
 				'tag' => 'white',
 				'before' => '<span style="color: white;" class="bbc_color">',
 				'after' => '</span>',
@@ -1853,11 +1865,14 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						$data = strtr($data, array('&#039;' => '\'', '&nbsp;' => $context['utf8'] ? "\xC2\xA0" : "\xA0", '&quot;' => '>">', '"' => '<"<', '&lt;' => '<lt<'));
 
 						// Only do this if the preg survives.
+						//First line in each array added by "Simple_Youtube_Video_Embed_BBC" mod to parse youtube videos automatically
 						if (is_string($result = preg_replace(array(
+							'~(?:http|https|)(?::\/\/|)(?:www.|)(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/ytscreeningroom\?v=|\/feeds\/api\/videos\/|\/user\S*[^\w\-\s]|\S*[^\w\-\s]))([\w\-]{11})[a-z0-9;:@?&%=+\/\$_.-]*~i',
 							'~(?<=[\s>\.(;\'"]|^)((?:http|https)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\w\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\])~i',
 							'~(?<=[\s>\.(;\'"]|^)((?:ftp|ftps)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\w\-_\~%\.@,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\])~i',
 							'~(?<=[\s>(\'<]|^)(www(?:\.[\w\-_]+)+(?::\d+)?(?:/[\w\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\])~i'
 						), array(
+							'[youtube]$1[/youtube]',
 							'[url]$1[/url]',
 							'[ftp]$1[/ftp]',
 							'[url=http://$1]$1[/url]'

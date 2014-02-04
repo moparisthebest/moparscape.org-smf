@@ -1567,6 +1567,13 @@ function create_control_richedit($editorOptions)
 		);
 		$context['bbc_tags'][] = array(
 			array(
+				'image' => 'youtube',
+				'code' => 'youtube',
+				'before' => '[youtube]',
+				'after' => '[/youtube]',
+				'description' => 'YouTube'
+			),
+			array(
 				'image' => 'flash',
 				'code' => 'flash',
 				'before' => '[flash=200,200]',

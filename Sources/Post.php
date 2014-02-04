@@ -82,6 +82,11 @@ if (!defined('SMF'))
 
 function Post()
 {
+// Double Post Stopper change - Start
+	checkForBump();
+// End		
+	
+
 	global $txt, $scripturl, $topic, $modSettings, $board;
 	global $user_info, $sc, $board_info, $context, $settings;
 	global $sourcedir, $options, $smcFunc, $language;
@@ -1208,6 +1213,11 @@ function Post()
 
 function Post2()
 {
+// Double Post Stopper change - Start
+	checkForBump();
+// End		
+	
+
 	global $board, $topic, $txt, $modSettings, $sourcedir, $context;
 	global $user_info, $board_info, $options, $smcFunc;
 
@@ -2891,4 +2901,50 @@ function JavaScriptModify()
 		obExit(false);
 }
 
+
+function checkForBump() {
+	// This function here is for the Mod : Double Post Stopper, Made by Dragooon.
+	// It Checks weather the Poster is trying to bump the topic or not.
+	global $smcFunc, $topic, $modSettings, $user_info;
+	if(isset($topic)) {		
+		// Do the Query to grab the stuff for checking.
+		$result = $smcFunc['db_query']('',"SELECT
+								m.poster_time, m.poster_name, m.poster_email
+							FROM 
+								{db_prefix}topics AS t, {db_prefix}messages AS m
+							WHERE
+								t.id_last_msg = m.id_msg
+								AND m.id_topic = {int:topic}
+								AND m.id_member = {int:user}					 
+							LIMIT 1"
+							,array('user' => $user_info['id'], 'topic' => $topic));	
+		if($smcFunc['db_num_rows']($result) <= 0)
+			return;
+			
+		$row = $smcFunc['db_fetch_assoc']($result);
+		$smcFunc['db_free_result']($result);
+		// Check it if its a Bump Attempt
+		// The Poster Time assigned to the variable
+		$lpt = $row['poster_time'];
+		$timeTHold = $modSettings['doublePostThold'] * 60 * 60 * 24;
+		
+		// Declare it false in begginning. If some conditions gets true, It turns into true, else it goes as false.
+		$bumpAttempt = false;
+		
+		// Time Not set? Declare it as true then 
+		if(empty($modSettings['doublePostThold']))
+			$bumpAttempt = true;
+		// Is it set?
+		elseif ($lpt + $timeTHold > time())
+			$bumpAttempt = true;
+
+		if(!isset($_REQUEST['msg']) && $bumpAttempt && !allowedTo('doublePost') && ($user_info['id'] > 0 || (isset($_POST['guestname']) && $_POST['guestname'] == $row['poster_name']) || (isset($_POST['email']) && $_POST['email'] == $row['poster_email'])))
+			fatal_lang_error('double_post_attempt');
+		else
+			return;
+	} else {
+	// Do nothing if it isn't set.
+		return;
+	}
+}
 ?>

@@ -339,6 +339,9 @@ function ModifyTopicSettings($return_config = false)
 			array('int', 'enableAllMessages', 'postinput' => $txt['manageposts_posts'], 'subtext' => $txt['enableAllMessages_zero']),
 			array('check', 'disableCustomPerPage'),
 			array('check', 'enablePreviousNext'),
+  		'',
+			array('int', 'doublePostThold', 'postinput' => $txt['doublePostAdmin_main'], 'subtext' => $txt['doublePostAdmin_sub']),
+
 
 	);
 

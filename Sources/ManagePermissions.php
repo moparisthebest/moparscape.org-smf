@@ -1512,6 +1512,8 @@ function loadAllPermissions($loadType = 'classic')
 			'delete' => array(true, 'post', 'modify', 'moderate'),
 			'modify' => array(true, 'post', 'modify', 'moderate'),
 			'report_any' => array(false, 'post', 'participate'),
+   			'doublePost' => array(false, 'post', 'participate'),
+
 			'poll_view' => array(false, 'poll', 'participate'),
 			'poll_vote' => array(false, 'poll', 'participate'),
 			'poll_post' => array(false, 'poll', 'post_polls'),

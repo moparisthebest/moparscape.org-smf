@@ -167,6 +167,21 @@ function template_html_above()
 	// Output any remaining HTML headers. (from mods, maybe?)
 	echo $context['html_headers'];
 
+	// xxx analytics
+	echo "
+	<script type=\"text/javascript\"><!-- // --><![CDATA[
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-6877554-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	// ]]></script>";
+	// xxx end analytics
+
 	echo '
 </head>
 <body>';
@@ -176,11 +191,13 @@ function template_body_above()
 {
 	global $context, $settings, $options, $scripturl, $txt, $modSettings;
 
+	// xxx replaced this logo with DL moparscape link
+//			<img class="floatright" id="smflogo" src="', $settings['images_url'], '/smflogo.gif" alt="Simple Machines Forum" />
 	echo '
 <div id="mainframe"', !empty($settings['forum_width']) ? ' style="width: ' . $settings['forum_width'] . '"' : '', '>
 	<div class="tborder">
 		<div class="catbg">
-			<img class="floatright" id="smflogo" src="', $settings['images_url'], '/smflogo.gif" alt="Simple Machines Forum" />
+			<a href="//www.moparscape.org/moparscape.html"><img class="floatright" id="smflogo" src="/dlmoparscape.png" alt="Download MoparScape Here!" /></a>
 			<h1 id="forum_name">';
 
 	if (empty($context['header_logo_url_html_safe']))
@@ -361,6 +378,21 @@ function template_body_above()
 	// Show the menu here, according to the menu sub template.
 	template_menu();
 
+	// xxx top ads
+	echo '<center>
+	<script type="text/javascript"><!--
+	google_ad_client = "ca-pub-3055920918910714";
+	google_ad_slot = "6430061462";
+	google_ad_width = 728;
+	google_ad_height = 90;
+	//-->
+	</script>
+	<script type="text/javascript"
+	src="//pagead2.googlesyndication.com/pagead/show_ads.js">
+	</script>
+	</center>';
+	// xxx end top ads
+
 	// Show the navigation tree.
 	theme_linktree();
 
@@ -375,6 +407,21 @@ function template_body_below()
 
 	echo '
 	</div>';
+
+	// xxx bottom ads
+	echo '<div id="bottom_ads" class="headerpadding topmargin clearfix"><center>
+	<script type="text/javascript"><!--
+	google_ad_client = "ca-pub-3055920918910714";
+	google_ad_slot = "6430061462";
+	google_ad_width = 728;
+	google_ad_height = 90;
+	//-->
+	</script>
+	<script type="text/javascript"
+	src="//pagead2.googlesyndication.com/pagead/show_ads.js">
+	</script>
+	</center></div>';
+	// xxx end bottom ads
 
 	// Show the "Powered by" and "Valid" logos, as well as the copyright. Remember, the copyright must be somewhere!
 	echo '

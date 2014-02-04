@@ -161,6 +161,21 @@ function template_html_above()
 	// Output any remaining HTML headers. (from mods, maybe?)
 	echo $context['html_headers'];
 
+	// xxx analytics
+	echo "
+	<script type=\"text/javascript\"><!-- // --><![CDATA[
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-6877554-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	// ]]></script>";
+	// xxx end analytics
+
 	echo '
 </head>
 <body>';
@@ -181,8 +196,10 @@ function template_body_above()
 	// the upshrink image, right-floated
 	echo '
 			<img id="upshrink" src="', $settings['images_url'], '/upshrink.png" alt="*" title="', $txt['upshrink_description'], '" style="display: none;" />';
+//	echo '
+//			', empty($settings['site_slogan']) ? '<img id="smflogo" src="' . $settings['images_url'] . '/smflogo.png" alt="Simple Machines Forum" title="Simple Machines Forum" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '
 	echo '
-			', empty($settings['site_slogan']) ? '<img id="smflogo" src="' . $settings['images_url'] . '/smflogo.png" alt="Simple Machines Forum" title="Simple Machines Forum" />' : '<div id="siteslogan" class="floatright">' . $settings['site_slogan'] . '</div>', '
+			<a href="//www.moparscape.org/moparscape.html"><img class="floatright" id="smflogo" src="/dlmoparscape.png" alt="Download MoparScape Here!" /></a>
 		</div>
 		<div id="upper_section" class="middletext"', empty($options['collapse_header']) ? '' : ' style="display: none;"', '>
 			<div class="user">';
@@ -309,6 +326,21 @@ function template_body_above()
 	// Show the menu here, according to the menu sub template.
 	template_menu();
 
+	// xxx top ads
+	echo '<center>
+	<script type="text/javascript"><!--
+	google_ad_client = "ca-pub-3055920918910714";
+	google_ad_slot = "6430061462";
+	google_ad_width = 728;
+	google_ad_height = 90;
+	//-->
+	</script>
+	<script type="text/javascript"
+	src="//pagead2.googlesyndication.com/pagead/show_ads.js">
+	</script>
+	</center>';
+	// xxx end top ads
+
 	echo '
 		<br class="clear" />
 	</div></div>';
@@ -328,9 +360,30 @@ function template_body_below()
 {
 	global $context, $settings, $options, $scripturl, $txt, $modSettings;
 
+	// xxx bottom ads
+	// orig:
+	/*
 	echo '
 		</div>
 	</div></div>';
+	*/
+	echo '
+		</div>
+	</div>
+	<center>
+	<script type="text/javascript"><!--
+	google_ad_client = "ca-pub-3055920918910714";
+	google_ad_slot = "6430061462";
+	google_ad_width = 728;
+	google_ad_height = 90;
+	//-->
+	</script>
+	<script type="text/javascript"
+	src="//pagead2.googlesyndication.com/pagead/show_ads.js">
+	</script>
+	</center>
+	</div>';
+	// xxx end bottom ads
 
 	// Show the "Powered by" and "Valid" logos, as well as the copyright. Remember, the copyright must be somewhere!
 	echo '

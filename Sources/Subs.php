@@ -3503,6 +3503,8 @@ function theme_copyright($get_it = false)
 
 	echo '
 			<span class="smalltext" style="display: inline; visibility: visible; font-family: Verdana, Arial, sans-serif;">' . $forum_copyright . '
+			| <a href="http://www.runescape.com/" title="Runescape" target="_blank" class="new_win">RuneScape &copy; 1999&ndash;2014, Jagex Ltd.</a>
+			| <a href="http://mopar.com/" title="Mopar" target="_blank" class="new_win">Mopar name and logos &copy; Chrysler Group LLC</a>
 			</span>';
 }
 

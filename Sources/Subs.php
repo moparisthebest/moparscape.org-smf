@@ -4080,6 +4080,18 @@ function setupMenuContext()
 					),
 				),
 			),
+			//xxx IRC Chat button
+			'irc' => array(
+				'title' => 'IRC Chat',
+				'href' => "//www.moparisthebest.com/irc.php?img=0&host=irc.moparscape.org&channel=moparscape".($context['user']['is_logged'] ? '&nick='.str_replace(" ","_",$context['user']['name']) : ''),
+				'show' => true,
+			),
+			//xxx RS Wiki button
+			'rswiki' => array(
+				'title' => 'RS Wiki',
+				'href' => "//rswiki.moparisthebest.com/",
+				'show' => true,
+			),
 			'calendar' => array(
 				'title' => $txt['calendar'],
 				'href' => $scripturl . '?action=calendar',

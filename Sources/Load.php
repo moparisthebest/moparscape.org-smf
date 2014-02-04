@@ -1012,6 +1012,25 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			$user_profile[$row['id_member']] = $row;
 		}
 		$smcFunc['db_free_result']($request);
+
+		// xxx Load the member's awards.
+		$request = $smcFunc['db_query']('', '
+			SELECT mem.id_member, mg.stars
+			FROM {db_prefix}membergroups AS mg, {db_prefix}members AS mem
+			WHERE (FIND_IN_SET(mg.id_group, mem.additional_groups) OR ( mg.id_group=mem.id_post_group AND mem.id_group != 0 ))
+				AND mg.showAddBadge=1
+				AND id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
+			array(
+				'loaded_ids' => count($new_loaded_ids) == 1 ? $new_loaded_ids[0] : $new_loaded_ids,
+			)
+		);
+
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+		{
+			$user_profile[$row['id_member']]['stars'] .= ';'.$row['stars'];
+		}
+		$smcFunc['db_free_result']($request);
+		// xxx end Load the member's awards.
 	}
 
 	if (!empty($new_loaded_ids) && $set !== 'minimal')
@@ -1108,7 +1127,33 @@ function loadMemberContext($user, $display_custom_fields = false)
 	$profile['signature'] = parse_bbc($profile['signature'], true, 'sig' . $profile['id_member']);
 
 	$profile['is_online'] = (!empty($profile['show_online']) || allowedTo('moderate_forum')) && $profile['is_online'] > 0;
-	$profile['stars'] = empty($profile['stars']) ? array('', '') : explode('#', $profile['stars']);
+	
+	// xxx changed for awards
+	// orig:
+	// $profile['stars'] = empty($profile['stars']) ? array('', '') : explode('#', $profile['stars']);
+	if(empty($profile['stars'])){
+		$group_stars = '';
+	}else{
+		$stars = array();
+		$count = 0;
+		foreach (explode(';', $profile['stars']) as $star){
+			$star = explode('#', $star);
+			if($count == 0){ // original stars
+				$group_stars = str_repeat('<img src="' . str_replace('$language', $context['user']['language'], isset($star[1]) ? $settings['images_url'] . '/' . $star[1] : '') . '" alt="*" border="0" />', empty($star[0]) || empty($star[1]) ? 0 : $star[0]);
+			}else{ // awards
+				// # $star[0] is number of images
+				// but in this case, it specifies whether the award is to be shown
+				// on mitb.com, mscp.org, or both
+				// 1 = both, 2 = mscp, 3 = mitb
+				// otherwise it will be equal to $award_id
+				//if( ($star[0] == 1) || ($star[0] == 2 && defined('MSCP')) || ($star[0] == 3 && !defined('MSCP')) || $star[0] == $award_id)
+				$group_stars .= "</li>\n\t\t\t\t\t\t".'<li><img src="' . str_replace('$language', $context['user']['language'], isset($star[1]) ? $settings['images_url'] . '/' . $star[1] : '') . '" alt="*" border="0" />';
+			}
+			++$count;
+		}
+	}
+	// xxx end changed for awards
+	
 	// Setup the buddy status here (One whole in_array call saved :P)
 	$profile['buddy'] = in_array($profile['id_member'], $user_info['buddies']);
 	$buddy_list = !empty($profile['buddy_list']) ? explode(',', $profile['buddy_list']) : array();
@@ -1212,7 +1257,11 @@ function loadMemberContext($user, $display_custom_fields = false)
 		'group_id' => $profile['id_group'],
 		'post_group' => $profile['post_group'],
 		'post_group_color' => $profile['post_group_color'],
-		'group_stars' => str_repeat('<img src="' . str_replace('$language', $context['user']['language'], isset($profile['stars'][1]) ? $settings['images_url'] . '/' . $profile['stars'][1] : '') . '" alt="*" />', empty($profile['stars'][0]) || empty($profile['stars'][1]) ? 0 : $profile['stars'][0]),
+		// xxx last awards edit
+		// orig:
+		// 'group_stars' => str_repeat('<img src="' . str_replace('$language', $context['user']['language'], isset($profile['stars'][1]) ? $settings['images_url'] . '/' . $profile['stars'][1] : '') . '" alt="*" />', empty($profile['stars'][0]) || empty($profile['stars'][1]) ? 0 : $profile['stars'][0]),
+		'group_stars' => $group_stars,
+		// xxx end last awards edit
 		'warning' => $profile['warning'],
 		'warning_status' => !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $profile['warning'] ? 'mute' : (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $profile['warning'] ? 'moderate' : (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $profile['warning'] ? 'watch' : (''))),
 		'local_time' => timeformat(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),

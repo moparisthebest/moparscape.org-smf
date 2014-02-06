@@ -431,7 +431,7 @@ function showPosts($memID)
 				SELECT
 					b.id_board, b.name AS bname, c.id_cat, c.name AS cname, m.id_topic, m.id_msg,
 					t.id_member_started, t.id_first_msg, t.id_last_msg, m.body, m.smileys_enabled,
-					m.subject, m.poster_time, m.approved
+					m.subject, m.poster_time, m.modified_time, m.approved
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
@@ -493,7 +493,7 @@ function showPosts($memID)
 			'can_reply' => false,
 			'can_mark_notify' => false,
 			'can_delete' => false,
-			'delete_possible' => ($row['id_first_msg'] != $row['id_msg'] || $row['id_last_msg'] == $row['id_msg']) && (empty($modSettings['edit_disable_time']) || $row['poster_time'] + $modSettings['edit_disable_time'] * 60 >= time()),
+			'delete_possible' => ($row['id_first_msg'] != $row['id_msg'] || $row['id_last_msg'] == $row['id_msg']) && (empty($modSettings['edit_disable_time']) || $row['modified_time'] + $modSettings['edit_disable_time'] * 60 >= time()),
 			'approved' => $row['approved'],
 		);
 

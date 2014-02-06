@@ -646,7 +646,7 @@ function Post()
 			if ($row['id_member'] == $user_info['id'] && !allowedTo('modify_any'))
 			{
 				// Give an extra five minutes over the disable time threshold, so they can type - assuming the post is public.
-				if ($row['approved'] && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
+				if ($row['approved'] && !empty($modSettings['edit_disable_time']) && $row['modified_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
 					fatal_lang_error('modify_post_time_passed', false);
 				elseif ($row['id_member_poster'] == $user_info['id'] && !allowedTo('modify_own'))
 					isAllowedTo('modify_replies');
@@ -749,7 +749,7 @@ function Post()
 		if ($row['id_member'] == $user_info['id'] && !allowedTo('modify_any'))
 		{
 			// Give an extra five minutes over the disable time threshold, so they can type - assuming the post is public.
-			if ($row['approved'] && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
+			if ($row['approved'] && !empty($modSettings['edit_disable_time']) && $row['modified_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
 				fatal_lang_error('modify_post_time_passed', false);
 			elseif ($row['id_member_poster'] == $user_info['id'] && !allowedTo('modify_own'))
 				isAllowedTo('modify_replies');
@@ -1397,7 +1397,7 @@ function Post2()
 		$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
 		$request = $smcFunc['db_query']('', '
-			SELECT id_member, poster_name, poster_email, poster_time, approved
+			SELECT id_member, poster_name, poster_email, poster_time, modified_time, approved
 			FROM {db_prefix}messages
 			WHERE id_msg = {int:id_msg}
 			LIMIT 1',
@@ -1442,7 +1442,7 @@ function Post2()
 
 		if ($row['id_member'] == $user_info['id'] && !allowedTo('modify_any'))
 		{
-			if ((!$modSettings['postmod_active'] || $row['approved']) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
+			if ((!$modSettings['postmod_active'] || $row['approved']) && !empty($modSettings['edit_disable_time']) && $row['modified_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
 				fatal_lang_error('modify_post_time_passed', false);
 			elseif ($topic_info['id_member_started'] == $user_info['id'] && !allowedTo('modify_own'))
 				isAllowedTo('modify_replies');
@@ -2688,7 +2688,7 @@ function JavaScriptModify()
 
 		if ($row['id_member'] == $user_info['id'] && !allowedTo('modify_any'))
 		{
-			if ((!$modSettings['postmod_active'] || $row['approved']) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
+			if ((!$modSettings['postmod_active'] || $row['approved']) && !empty($modSettings['edit_disable_time']) && $row['modified_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
 				fatal_lang_error('modify_post_time_passed', false);
 			elseif ($row['id_member_started'] == $user_info['id'] && !allowedTo('modify_own'))
 				isAllowedTo('modify_replies');

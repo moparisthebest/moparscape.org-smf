@@ -3944,7 +3944,7 @@ function loadClassFile($filename)
 
 function setupMenuContext()
 {
-	global $context, $modSettings, $user_info, $txt, $scripturl;
+	global $context, $modSettings, $user_info, $txt, $scripturl, $show_archived;
 
 	// Set up the menu privileges.
 	$context['allow_search'] = allowedTo('search_posts');
@@ -3968,6 +3968,12 @@ function setupMenuContext()
 				'sub_buttons' => array(
 				),
 				'is_last' => $context['right_to_left'],
+			),
+			//xxx show archived boards
+			'show_archived' => array(
+				'title' => ($show_archived ? 'Hide' : 'Show').' Archived Boards',
+				'href' => $scripturl . '?show_archived='.($show_archived ? 0 : 1),
+				'show' => isset($show_archived),
 			),
 			'help' => array(
 				'title' => $txt['help'],

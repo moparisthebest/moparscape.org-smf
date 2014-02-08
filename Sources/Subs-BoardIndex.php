@@ -30,7 +30,15 @@ if (!defined('SMF'))
 function getBoardIndex($boardIndexOptions)
 {
 	global $smcFunc, $scripturl, $user_info, $modSettings, $txt;
-	global $settings, $context;
+	global $settings, $context, $show_archived;
+
+	//xxx show archived boards
+	if($boardIndexOptions['include_categories']){
+		if(isset($_GET['show_archived']))
+			$_SESSION['show_archived'] = $_GET['show_archived'] == 0 ? 0 : 1;
+		$show_archived = !empty($user_info['possibly_robot']) || (isset($_SESSION['show_archived']) && $_SESSION['show_archived'] == 1);
+	}
+	//xxx end show archived boards
 
 	// For performance, track the latest post while going through the boards.
 	if (!empty($boardIndexOptions['set_latest_post']))
@@ -63,7 +71,9 @@ function getBoardIndex($boardIndexOptions)
 			LEFT JOIN {db_prefix}members AS mods_mem ON (mods_mem.id_member = mods.id_member)
 		WHERE {query_see_board}' . (empty($boardIndexOptions['countChildPosts']) ? (empty($boardIndexOptions['base_level']) ? '' : '
 			AND b.child_level >= {int:child_level}') : '
-			AND b.child_level BETWEEN ' . $boardIndexOptions['base_level'] . ' AND ' . ($boardIndexOptions['base_level'] + 1)),
+			AND b.child_level BETWEEN ' . $boardIndexOptions['base_level'] . ' AND ' . ($boardIndexOptions['base_level'] + 1)) .
+			//xxx show archived boards
+			(isset($show_archived) && !$show_archived ? ' AND c.forumid = 1' : ''),
 		array(
 			'current_member' => $user_info['id'],
 			'child_level' => $boardIndexOptions['base_level'],

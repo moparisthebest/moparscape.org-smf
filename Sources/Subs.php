@@ -3969,12 +3969,14 @@ function setupMenuContext()
 				),
 				'is_last' => $context['right_to_left'],
 			),
-			//xxx show archived boards
+			//xxx show archived boards, commented out for Tom :)
+			/*
 			'show_archived' => array(
 				'title' => ($show_archived ? 'Hide' : 'Show').' Archived Boards',
 				'href' => $scripturl . '?show_archived='.($show_archived ? 0 : 1),
 				'show' => isset($show_archived),
 			),
+			*/
 			'help' => array(
 				'title' => $txt['help'],
 				'href' => $scripturl . '?action=help',

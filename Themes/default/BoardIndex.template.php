@@ -274,7 +274,7 @@ function template_main()
 
 function template_info_center()
 {
-	global $context, $settings, $options, $txt, $scripturl, $modSettings;
+	global $context, $settings, $options, $txt, $scripturl, $modSettings, $show_archived;
 
 	// Here's where the "Info Center" starts...
 	echo '
@@ -384,6 +384,7 @@ function template_info_center()
 	// Show statistical style information...
 	if ($settings['show_stats_index'])
 	{
+		//xxx show archived boards
 		echo '
 			<div class="title_barIC">
 				<h4 class="titlebg">
@@ -396,7 +397,8 @@ function template_info_center()
 			<p>
 				', $context['common_stats']['total_posts'], ' ', $txt['posts_made'], ' ', $txt['in'], ' ', $context['common_stats']['total_topics'], ' ', $txt['topics'], ' ', $txt['by'], ' ', $context['common_stats']['total_members'], ' ', $txt['members'], '. ', !empty($settings['show_latest_member']) ? $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>' : '', '<br />
 				', (!empty($context['latest_post']) ? $txt['latest_post'] . ': <strong>&quot;' . $context['latest_post']['link'] . '&quot;</strong>  ( ' . $context['latest_post']['time'] . ' )<br />' : ''), '
-				<a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a>', $context['show_stats'] ? '<br />
+				<a href="', $scripturl, '?action=recent">', $txt['recent_view'], '</a><br />
+				<a href="', $scripturl, '?show_archived='.($show_archived ? 0 : 1).'">', ($show_archived ? 'Hide' : 'View'), ' Archived Boards.</a>', $context['show_stats'] ? '<br />
 				<a href="' . $scripturl . '?action=stats">' . $txt['more_stats'] . '</a>' : '', '
 			</p>';
 	}

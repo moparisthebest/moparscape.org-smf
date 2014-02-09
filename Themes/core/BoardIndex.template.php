@@ -392,6 +392,9 @@ function template_info_center()
 	if (!empty($bracketList))
 		echo ' (' . implode(', ', $bracketList) . ')';
 
+	//xxx Total online
+	echo ", ".($context['num_guests']+$context['num_users_online'])." Total";
+
 	echo $context['show_who'] ? '</a>' : '', '
 						<div class="smalltext">';
 

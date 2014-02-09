@@ -252,7 +252,7 @@ code.bbc_code
 /* The "Quote:" and "Code:" header parts... */
 .codeheader, .quoteheader
 {
-	color: #000;
+/*	color: #000;  xxx no-one liked this*/
 	text-decoration: none;
 	font-style: normal;
 	font-weight: bold;
@@ -3539,4 +3539,16 @@ ul.nolist li
 	word-wrap: break-word;
 	overflow: auto;
 	max-height: 306px;
+}
+/* xxx float these items to the right */
+img#smflogo
+{
+	padding-top: 0.1em;
+/*	padding-left: 10px; */
+	vertical-align: top;
+}
+/* xxx don't display images in signatures */
+.signature img, .signature object, .signature embed
+{
+	display: none;
 }

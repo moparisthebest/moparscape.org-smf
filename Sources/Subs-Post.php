@@ -1749,7 +1749,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 // - Mandatory parameters are set.
 function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 {
-	global $user_info, $txt, $modSettings, $smcFunc, $context;
+	global $user_info, $txt, $modSettings, $smcFunc, $context, $autospam;
 
 	// Set optional parameters to the default value.
 	$msgOptions['icon'] = empty($msgOptions['icon']) ? 'xx' : $msgOptions['icon'];
@@ -1824,6 +1824,35 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	$previous_ignore_user_abort = ignore_user_abort(true);
 
 	$new_topic = empty($topicOptions['id']);
+
+	// xxx auto spam detection here
+	if(isset($autospam) && ($user_info['posts'] < 5)) {
+		$lower_body = strtolower($msgOptions['body']);
+
+		// if there are more than 2 links, create a new topic in the $autospam board
+		if(substr_count($lower_body, '[/url]') > 2 || substr_count($lower_body, 'http://') > 2 || substr_count($lower_body, 'https://') > 2) {
+			$topicOptions['board'] = $autospam;
+		} else {
+			// if any badstrings appear, send it to autospam
+			$badstrings = array('[/img][/url]', 'order generic', 'nude', 'preteen', 'naked');
+			foreach ($badstrings as $bad)
+				if(strpos($lower_body, $bad) !== FALSE){
+					$topicOptions['board'] = $autospam;
+					break;
+				}
+		}
+
+		if($topicOptions['board'] == $autospam) {
+			// make it a new topic even if they originally meant it to be a reply
+			$new_topic = true;
+			$topicOptions['id'] = 0;
+			// make it approved
+			$msgOptions['approved'] = 1;
+			// DO NOT UPDATE POST COUNT
+			$posterOptions['update_post_count'] = 0;
+		}
+	}
+	// xxx end auto spam detection here
 
 	// Insert the post.
 	$smcFunc['db_insert']('',

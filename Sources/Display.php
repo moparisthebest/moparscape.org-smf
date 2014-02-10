@@ -1139,7 +1139,7 @@ function prepareDisplayContext($reset = false)
 	$message['subject'] = $message['subject'] != '' ? $message['subject'] : $txt['no_subject'];
 
 	// Are you allowed to remove at least a single reply?
-	$context['can_remove_post'] |= allowedTo('delete_own') && (empty($modSettings['edit_disable_time']) || $message['modified_time'] + $modSettings['edit_disable_time'] * 60 >= time()) && $message['id_member'] == $user_info['id'];
+	$context['can_remove_post'] |= allowedTo('delete_own') && (empty($modSettings['edit_disable_time']) || max($message['modified_time'], $message['poster_time']) + $modSettings['edit_disable_time'] * 60 >= time()) && $message['id_member'] == $user_info['id'];
 
 	// If it couldn't load, or the user was a guest.... someday may be done with a guest table.
 	if (!loadMemberContext($message['id_member'], true))
@@ -1195,8 +1195,8 @@ function prepareDisplayContext($reset = false)
 		'is_ignored' => !empty($modSettings['enable_buddylist']) && !empty($options['posts_apply_ignore_list']) && in_array($message['id_member'], $context['user']['ignoreusers']),
 		'can_approve' => !$message['approved'] && $context['can_approve'],
 		'can_unapprove' => $message['approved'] && $context['can_approve'],
-		'can_modify' => (!$context['is_locked'] || allowedTo('moderate_board')) && (allowedTo('modify_any') || (allowedTo('modify_replies') && $context['user']['started']) || (allowedTo('modify_own') && $message['id_member'] == $user_info['id'] && (empty($modSettings['edit_disable_time']) || !$message['approved'] || $message['modified_time'] + $modSettings['edit_disable_time'] * 60 > time()))),
-		'can_remove' => allowedTo('delete_any') || (allowedTo('delete_replies') && $context['user']['started']) || (allowedTo('delete_own') && $message['id_member'] == $user_info['id'] && (empty($modSettings['edit_disable_time']) || $message['modified_time'] + $modSettings['edit_disable_time'] * 60 > time())),
+		'can_modify' => (!$context['is_locked'] || allowedTo('moderate_board')) && (allowedTo('modify_any') || (allowedTo('modify_replies') && $context['user']['started']) || (allowedTo('modify_own') && $message['id_member'] == $user_info['id'] && (empty($modSettings['edit_disable_time']) || !$message['approved'] || max($message['modified_time'], $message['poster_time']) + $modSettings['edit_disable_time'] * 60 > time()))),
+		'can_remove' => allowedTo('delete_any') || (allowedTo('delete_replies') && $context['user']['started']) || (allowedTo('delete_own') && $message['id_member'] == $user_info['id'] && (empty($modSettings['edit_disable_time']) || max($message['modified_time'], $message['poster_time']) + $modSettings['edit_disable_time'] * 60 > time())),
 		'can_see_ip' => allowedTo('moderate_forum') || ($message['id_member'] == $user_info['id'] && !empty($user_info['id'])),
 	);
 
@@ -1669,7 +1669,7 @@ function QuickInTopicModeration()
 
 	// Allowed to remove which messages?
 	$request = $smcFunc['db_query']('', '
-		SELECT id_msg, subject, id_member, poster_time, modified_time
+		SELECT id_msg, subject, id_member, poster_time, GREATEST(poster_time, modified_time) AS last_modified_time
 		FROM {db_prefix}messages
 		WHERE id_msg IN ({array_int:message_list})
 			AND id_topic = {int:current_topic}' . (!$allowed_all ? '
@@ -1684,7 +1684,7 @@ function QuickInTopicModeration()
 	$messages = array();
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		if (!$allowed_all && !empty($modSettings['edit_disable_time']) && $row['modified_time'] + $modSettings['edit_disable_time'] * 60 < time())
+		if (!$allowed_all && !empty($modSettings['edit_disable_time']) && $row['last_modified_time'] + $modSettings['edit_disable_time'] * 60 < time())
 			continue;
 
 		$messages[$row['id_msg']] = array($row['subject'], $row['id_member']);

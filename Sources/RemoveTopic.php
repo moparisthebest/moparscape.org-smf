@@ -96,7 +96,7 @@ function DeleteMessage()
 		$topic = (int) $_REQUEST['topic'];
 
 	$request = $smcFunc['db_query']('', '
-		SELECT t.id_member_started, m.id_member, m.subject, m.poster_time, m.modified_time, m.approved
+		SELECT t.id_member_started, m.id_member, m.subject, m.poster_time, GREATEST(m.poster_time, m.modified_time) AS last_modified_time, m.approved
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = {int:id_msg} AND m.id_topic = {int:current_topic})
 		WHERE t.id_topic = {int:current_topic}
@@ -106,7 +106,7 @@ function DeleteMessage()
 			'id_msg' => $_REQUEST['msg'],
 		)
 	);
-	list ($starter, $poster, $subject, $post_time, $modified_time, $approved) = $smcFunc['db_fetch_row']($request);
+	list ($starter, $poster, $subject, $post_time, $last_modified_time, $approved) = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
 
 	// Verify they can see this!
@@ -122,7 +122,7 @@ function DeleteMessage()
 			elseif (!allowedTo('delete_any'))
 				isAllowedTo('delete_own');
 		}
-		elseif (!allowedTo('delete_any') && ($starter != $user_info['id'] || !allowedTo('delete_replies')) && !empty($modSettings['edit_disable_time']) && $modified_time + $modSettings['edit_disable_time'] * 60 < time())
+		elseif (!allowedTo('delete_any') && ($starter != $user_info['id'] || !allowedTo('delete_replies')) && !empty($modSettings['edit_disable_time']) && $last_modified_time + $modSettings['edit_disable_time'] * 60 < time())
 			fatal_lang_error('modify_post_time_passed', false);
 	}
 	elseif ($starter == $user_info['id'] && !allowedTo('delete_any'))
@@ -554,7 +554,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 	$request = $smcFunc['db_query']('', '
 		SELECT
-			m.id_member, m.icon, m.poster_time, m.modified_time, m.subject,' . (empty($modSettings['search_custom_index_config']) ? '' : ' m.body,') . '
+			m.id_member, m.icon, m.poster_time, GREATEST(m.poster_time, m.modified_time) AS last_modified_time, m.subject,' . (empty($modSettings['search_custom_index_config']) ? '' : ' m.body,') . '
 			m.approved, t.id_topic, t.id_first_msg, t.id_last_msg, t.num_replies, t.id_board,
 			t.id_member_started AS id_member_poster,
 			b.count_posts
@@ -595,7 +595,7 @@ function removeMessage($message, $decreasePostCount = true)
 					else
 						fatal_lang_error('cannot_delete_own', 'permission');
 				}
-				elseif (($row['id_member_poster'] != $user_info['id'] || !$delete_replies) && !empty($modSettings['edit_disable_time']) && $row['modified_time'] + $modSettings['edit_disable_time'] * 60 < time())
+				elseif (($row['id_member_poster'] != $user_info['id'] || !$delete_replies) && !empty($modSettings['edit_disable_time']) && $row['last_modified_time'] + $modSettings['edit_disable_time'] * 60 < time())
 					fatal_lang_error('modify_post_time_passed', false);
 			}
 			elseif ($row['id_member_poster'] == $user_info['id'])
@@ -627,7 +627,7 @@ function removeMessage($message, $decreasePostCount = true)
 				elseif (!allowedTo('delete_any'))
 					isAllowedTo('delete_own');
 			}
-			elseif (!allowedTo('delete_any') && ($row['id_member_poster'] != $user_info['id'] || !allowedTo('delete_replies')) && !empty($modSettings['edit_disable_time']) && $row['modified_time'] + $modSettings['edit_disable_time'] * 60 < time())
+			elseif (!allowedTo('delete_any') && ($row['id_member_poster'] != $user_info['id'] || !allowedTo('delete_replies')) && !empty($modSettings['edit_disable_time']) && $row['last_modified_time'] + $modSettings['edit_disable_time'] * 60 < time())
 				fatal_lang_error('modify_post_time_passed', false);
 		}
 		elseif ($row['id_member_poster'] == $user_info['id'] && !allowedTo('delete_any'))

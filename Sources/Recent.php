@@ -289,7 +289,7 @@ function RecentPosts()
 	// Get all the most recent posts.
 	$request = $smcFunc['db_query']('', '
 		SELECT
-			m.id_msg, m.subject, m.smileys_enabled, m.poster_time, m.modified_time, m.body, m.id_topic, t.id_board, b.id_cat,
+			m.id_msg, m.subject, m.smileys_enabled, m.poster_time, GREATEST(m.poster_time, m.modified_time) AS last_modified_time, m.body, m.id_topic, t.id_board, b.id_cat,
 			b.name AS bname, c.name AS cname, t.num_replies, m.id_member, m2.id_member AS id_first_member,
 			IFNULL(mem2.real_name, m2.poster_name) AS first_poster_name, t.id_first_msg,
 			IFNULL(mem.real_name, m.poster_name) AS poster_name, t.id_last_msg
@@ -359,7 +359,7 @@ function RecentPosts()
 			'can_reply' => false,
 			'can_mark_notify' => false,
 			'can_delete' => false,
-			'delete_possible' => ($row['id_first_msg'] != $row['id_msg'] || $row['id_last_msg'] == $row['id_msg']) && (empty($modSettings['edit_disable_time']) || $row['modified_time'] + $modSettings['edit_disable_time'] * 60 >= time()),
+			'delete_possible' => ($row['id_first_msg'] != $row['id_msg'] || $row['id_last_msg'] == $row['id_msg']) && (empty($modSettings['edit_disable_time']) || $row['last_modified_time'] + $modSettings['edit_disable_time'] * 60 >= time()),
 		);
 
 		if ($user_info['id'] == $row['id_first_member'])

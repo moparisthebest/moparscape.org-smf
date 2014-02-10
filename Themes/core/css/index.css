@@ -221,6 +221,7 @@ blockquote.bbc_standard_quote, blockquote.bbc_alternate_quote
 	font-size: x-small;
 	line-height: 1.4em;
 	overflow: auto;
+	margin-bottom: 1em; /* xxx added this back from RC2 */
 }
 
 /* Alterate block quote stylings */

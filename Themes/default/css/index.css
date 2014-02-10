@@ -304,6 +304,7 @@ blockquote.bbc_standard_quote, blockquote.bbc_alternate_quote
 	padding: 1.1em 1.4em;
 	margin: 0.1em 0 0.3em 0;
 	overflow: auto;
+	margin-bottom: 1em; /* xxx added this back from RC2 */
 }
 
 /* Alterate blockquote stylings */

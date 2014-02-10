@@ -253,7 +253,9 @@ function loadProfileFields($force_reload = false)
 			'value' => empty($cur_profile['date_registered']) ? $txt['not_applicable'] : strftime('%Y-%m-%d', $cur_profile['date_registered'] + ($user_info['time_offset'] + $modSettings['time_offset']) * 3600),
 			'label' => $txt['date_registered'],
 			'log_change' => true,
-			'permission' => 'moderate_forum',
+			// xxx moderators should not be allowed to change this
+			//orig: 'permission' => 'moderate_forum',
+			'permission' => 'admin_forum',
 			'input_validate' => create_function('&$value', '
 				global $txt, $user_info, $modSettings, $cur_profile, $context;
 
@@ -565,20 +567,23 @@ function loadProfileFields($force_reload = false)
 			'label' => $txt['profile_posts'],
 			'log_change' => true,
 			'size' => 7,
-			'permission' => 'moderate_forum',
+			//xxx orig: 'permission' => 'moderate_forum',
+			'permission' => 'admin_forum',
 			'input_validate' => create_function('&$value', '
 				$value = $value != \'\' ? strtr($value, array(\',\' => \'\', \'.\' => \'\', \' \' => \'\')) : 0;
 				return true;
 			'),
 		),
 		'real_name' => array(
-			'type' => !empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum') ? 'text' : 'label',
+			//xxx orig: 'type' => !empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum') ? 'text' : 'label',
+			'type' => !empty($modSettings['allow_editDisplayName']) || allowedTo('admin_forum') ? 'text' : 'label',
 			'label' => $txt['name'],
 			'subtext' => $txt['display_name_desc'],
 			'log_change' => true,
 			'input_attr' => array('maxlength="60"'),
 			'permission' => 'profile_identity',
-			'enabled' => !empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum'),
+			//xxx orig: 'enabled' => !empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum'),
+			'enabled' => !empty($modSettings['allow_editDisplayName']) || allowedTo('admin_forum'),
 			'input_validate' => create_function('&$value', '
 				global $context, $smcFunc, $sourcedir, $cur_profile;
 
@@ -1294,8 +1299,81 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 					$value = (int) $value;
 				}
 				elseif (substr($row['mask'], 0, 5) == 'regex' && trim($value) != '' && preg_match(substr($row['mask'], 5), $value) === 0)
-					$value = '';
+					$value = isset($user_profile[$memID]['options'][$row['col_name']]) ? $user_profile[$memID]['options'][$row['col_name']] : '';
+					// xxx changed this to above: $value = '';
 			}
+
+			// xxx if we are editing our minecraft name, make sure there are no duplicates
+			if($area != 'register' && ($row['col_name'] == "cust_minecra" || $row['col_name'] == "cust_rscnam") && $value != '' && (!isset($user_profile[$memID]['options'][$row['col_name']]) || $user_profile[$memID]['options'][$row['col_name']] != $value)){
+					$what_name = $row['col_name'] == "cust_minecra" ? 'Minecraft' : 'RSC';
+
+					$forum_group_banned = 86;
+					foreach (explode(',', $user_profile[$memID]['additional_groups']) as $group)
+						if($group == $forum_group_banned)
+							die("This $what_name account has been banned, contact staff for clarification.");
+
+					$already_taken_memID = -1;
+					$already_taken_memName = 'This user';
+					// first check the custom names
+					$mc_request = $smcFunc['db_query']('', '
+						SELECT `id_member`
+						FROM `{db_prefix}themes`
+						WHERE `variable` = {string:col_name}
+							AND `value` = {string:value}
+							AND id_member != {int:id_member}',
+						array(
+							'col_name' => $row['col_name'],
+							'value' => strtolower($value),
+							'id_member' => $memID,
+						)
+					);
+					if($mc_row = $smcFunc['db_fetch_assoc']($mc_request))
+						$already_taken_memID = $mc_row['id_member'];
+					$smcFunc['db_free_result']($mc_request);
+
+					// if custom name is not taken, compare it to account names, or just grab name
+					$mc_request = $smcFunc['db_query']('', '
+						SELECT `id_member`, `real_name`
+						FROM `{db_prefix}members`
+						WHERE id_member = {int:already_taken_memID} OR 
+								(
+									(
+										`real_name` = {string:value}
+										OR `member_name` = {string:value}
+									)
+									AND id_member != {int:id_member}
+								)',
+						array(
+							'already_taken_memID' => $already_taken_memID,
+							'value' => strtolower($value),
+							'id_member' => $memID,
+						)
+					);
+
+					if($mc_row = $smcFunc['db_fetch_assoc']($mc_request)){
+						$already_taken_memID = $mc_row['id_member'];
+						$already_taken_memName = $mc_row['real_name'];
+					}
+					$smcFunc['db_free_result']($mc_request);
+
+					if($already_taken_memID != -1){
+						// then someone already is using this name
+						global $boardurl;
+						die('<html>Error: <a href="'.$boardurl.'/index.php?action=profile;u='.$already_taken_memID."\">$already_taken_memName</a> has already registered this $what_name name!</html>");
+					}
+
+					//echo "success!"; exit;
+			}
+			if($area != 'register' && ($row['col_name'] == "cust_moparcr") && $value != '' && strlen($value) != 40 && (!isset($user_profile[$memID]['options'][$row['col_name']]) || $user_profile[$memID]['options'][$row['col_name']] != $value)){
+				//print_r($user_info);echo("--------------------------------------------------------------\n");print_r($user_profile);exit;
+				//die(strlen($value)."bob");
+				if(strlen($value) > 30)
+					die("<html>Error: Maximum length for MoparCraft server password is 30 characters.</html>");
+				$value = sha1(strtolower($user_profile[$memID]['member_name']) . htmlspecialchars_decode($value));
+				if($user_info['id'] == $memID && $value == $user_info['passwd'])
+					die("<html>Error: You can't set your MoparCraft server password to be the same as your forum password, if you want to use your forum password, leave this blank.</html>");
+			}
+			//xxx end 
 		}
 
 		// Did it change?
@@ -2363,6 +2441,9 @@ function profileLoadSignatureData()
 		'max_font_size' => isset($sig_limits[7]) ? $sig_limits[7] : 0,
 		'bbc' => !empty($sig_bbc) ? explode(',', $sig_bbc) : array(),
 	);
+	//xxx if it is moparisthebest, increase sig max length
+	if($context['id_member'] == 1)
+		$context['signature_limits']['max_length'] *= 2;
 	// Kept this line in for backwards compatibility!
 	$context['max_signature_length'] = $context['signature_limits']['max_length'];
 	// Warning message for signature image limits?

@@ -453,6 +453,66 @@ function Register2($verifiedOpenID = false)
 			}
 		}
 
+			// xxx if we are editing our minecraft name, make sure there are no duplicates
+			if(($row['col_name'] == "cust_minecra" || $row['col_name'] == "cust_rscnam") && $value != ''){
+
+					$already_taken_memID = -1;
+					$already_taken_memName = 'This user';
+					// first check the custom names
+					$mc_request = $smcFunc['db_query']('', '
+						SELECT `id_member`
+						FROM `{db_prefix}themes`
+						WHERE `variable` = {string:col_name}
+							AND `value` = {string:value}',
+						array(
+							'col_name' => $row['col_name'],
+							'value' => strtolower($value),
+						)
+					);
+					if($mc_row = $smcFunc['db_fetch_assoc']($mc_request))
+						$already_taken_memID = $mc_row['id_member'];
+					$smcFunc['db_free_result']($mc_request);
+
+					// if custom name is not taken, compare it to account names, or just grab name
+					$mc_request = $smcFunc['db_query']('', '
+						SELECT `id_member`, `real_name`
+						FROM `{db_prefix}members`
+						WHERE id_member = {int:already_taken_memID} OR 
+								(
+									(
+										`real_name` = {string:value}
+										OR `member_name` = {string:value}
+									)
+								)',
+						array(
+							'already_taken_memID' => $already_taken_memID,
+							'value' => strtolower($value),
+						)
+					);
+					if($mc_row = $smcFunc['db_fetch_assoc']($mc_request)){
+						$already_taken_memID = $mc_row['id_member'];
+						$already_taken_memName = $mc_row['real_name'];
+					}
+					$smcFunc['db_free_result']($mc_request);
+
+					if($already_taken_memID != -1){
+						// then someone already is using this name
+						global $boardurl;
+						$what_name = $row['col_name'] == "cust_minecra" ? 'Minecraft' : 'RSC';
+						die('<html>Error: <a href="'.$boardurl.'/index.php?action=profile;u='.$already_taken_memID."\">$already_taken_memName</a> has already registered this $what_name name!</html>");
+					}
+			}
+
+			if(($row['col_name'] == "cust_moparcr") && $value != '' && strlen($value) != 40){
+				if(strlen($value) > 30)
+					die("<html>Error: Maximum length for MoparCraft server password is 30 characters.</html>");
+				if($value == $regOptions['password'])
+					die("<html>Error: You can't set your MoparCraft server password to be the same as your forum password, if you want to use your forum password, leave this blank.</html>");
+				$value = sha1(strtolower($regOptions['username']) . htmlspecialchars_decode($value));
+				$_POST['customfield'][$row['col_name']] = $value;
+			}
+			// xxx end if we are editing our minecraft name, make sure there are no duplicates
+
 		// Is this required but not there?
 		if (trim($value) == '' && $row['show_reg'] > 1)
 			$custom_field_errors[] = array('custom_field_empty', array($row['field_name']));
@@ -853,6 +913,10 @@ function RegisterCheckUsername()
 	$context['checked_username'] = preg_replace('~[\t\n\r \x0B\0' . ($context['utf8'] ? ($context['server']['complex_preg_chars'] ? '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}' : "\xC2\xA0\xC2\xAD\xE2\x80\x80-\xE2\x80\x8F\xE2\x80\x9F\xE2\x80\xAF\xE2\x80\x9F\xE3\x80\x80\xEF\xBB\xBF") : '\x00-\x08\x0B\x0C\x0E-\x19\xA0') . ']+~' . ($context['utf8'] ? 'u' : ''), ' ', $context['checked_username']);
 	if ($smcFunc['strlen']($context['checked_username']) > 25)
 		$context['checked_username'] = $smcFunc['htmltrim']($smcFunc['substr']($context['checked_username'], 0, 25));
+
+	//xxx only allow these characters
+	if(!RegisterUserIsAllowed($context['checked_username'], "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ /-:.%0123456789_"))
+		$context['valid_username'] = false;
 
 	// Only these characters are permitted.
 	if (preg_match('~[<>&"\'=\\\]~', preg_replace('~&#(?:\\d{1,7}|x[0-9a-fA-F]{1,6});~', '', $context['checked_username'])) != 0 || $context['checked_username'] == '_' || $context['checked_username'] == '|' || strpos($context['checked_username'], '[code') !== false || strpos($context['checked_username'], '[/code') !== false)

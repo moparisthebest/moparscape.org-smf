@@ -111,6 +111,7 @@ function getBirthdayRange($low_date, $high_date)
 	$year_high = (int) substr($high_date, 0, 4);
 
 	// Collect all of the birthdays for this month.  I know, it's a painful query.
+	// xxx added posts > 9 for birthdays
 	$result = $smcFunc['db_query']('birthday_array', '
 		SELECT id_member, real_name, YEAR(birthdate) AS birth_year, birthdate
 		FROM {db_prefix}members
@@ -122,8 +123,9 @@ function getBirthdayRange($low_date, $high_date)
 				DATE_FORMAT(birthdate, {string:year_low}) BETWEEN {date:low_date} AND {date:high_date}' . ($year_low == $year_high ? '' : '
 				OR DATE_FORMAT(birthdate, {string:year_high}) BETWEEN {date:low_date} AND {date:high_date}') . '
 			)
-			AND is_activated = {int:is_activated}',
+			AND is_activated = {int:is_activated} AND posts > {int:posts}',
 		array(
+			'posts' => 9,
 			'is_activated' => 1,
 			'no_month' => 0,
 			'no_day' => 0,

@@ -22,6 +22,8 @@
 	with the URL index.php?action=action-in-url.  Relatively simple, no?
 */
 
+require_once('/home/www-data/htdocs/agreed.php');
+
 $forum_version = 'SMF 2.0.7';
 
 // Get everything started up...

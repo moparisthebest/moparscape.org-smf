@@ -762,7 +762,11 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 		foreach ($to_array as $to)
 		{
-			if (!mail(strtr($to, array("\r" => '', "\n" => '')), $subject, $message, $headers))
+			// xxx add in sendmail parameters here
+			$sendmail_from_addy = (empty($modSettings['mail_from']) ? $webmaster_email : $modSettings['mail_from']);
+			$sendmail_params = "-f $sendmail_from_addy -r $sendmail_from_addy";
+			if (!mail(strtr($to, array("\r" => '', "\n" => '')), $subject, $message, $headers, $sendmail_params))
+			//orig: if (!mail(strtr($to, array("\r" => '', "\n" => '')), $subject, $message, $headers))
 			{
 				log_error(sprintf($txt['mail_send_unable'], $to));
 				$mail_result = false;

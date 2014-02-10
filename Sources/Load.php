@@ -1018,7 +1018,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			SELECT mem.id_member, mg.stars
 			FROM {db_prefix}membergroups AS mg, {db_prefix}members AS mem
 			WHERE (FIND_IN_SET(mg.id_group, mem.additional_groups) OR ( mg.id_group=mem.id_post_group AND mem.id_group != 0 ))
-				AND mg.showAddBadge=1
+				AND mg.showAddBadge=1 AND mg.stars != \'\'
 				AND id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
 			array(
 				'loaded_ids' => count($new_loaded_ids) == 1 ? $new_loaded_ids[0] : $new_loaded_ids,

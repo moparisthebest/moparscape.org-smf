@@ -73,7 +73,8 @@ function getBoardIndex($boardIndexOptions)
 			AND b.child_level >= {int:child_level}') : '
 			AND b.child_level BETWEEN ' . $boardIndexOptions['base_level'] . ' AND ' . ($boardIndexOptions['base_level'] + 1)) .
 			//xxx show archived boards
-			(isset($show_archived) && !$show_archived ? ' AND c.forumid = 1' : ''),
+			(isset($show_archived) && !$show_archived ? ' AND c.forumid = 1' : '').'
+			ORDER BY ' . ($boardIndexOptions['include_categories'] ? 'c.cat_order, ' : '') . 'b.board_order',
 		array(
 			'current_member' => $user_info['id'],
 			'child_level' => $boardIndexOptions['base_level'],

@@ -453,6 +453,8 @@ function ModifyBasicSettings($return_config = false)
 	$config_vars = array(
 			// Big Options... polls, sticky, bbc....
 			array('select', 'pollMode', array($txt['disable_polls'], $txt['enable_polls'], $txt['polls_as_topics'])),
+
+			array('select', 'defaultSpoilerStyle', array(1 => $txt['spoiler_tag_onhoverovershow'], 2 => $txt['spoiler_tag_onlinkclickshow'], 3 => $txt['spoiler_tag_onbuttonclickshow'])),
 		'',
 			// Basic stuff, titles, flash, permissions...
 			array('check', 'allow_guestAccess'),

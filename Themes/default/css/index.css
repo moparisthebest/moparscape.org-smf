@@ -3650,3 +3650,40 @@ img#smflogo
 {
 	display: none;
 }
+fieldset.spoiler 
+{
+	border: 1px dashed gray;
+}
+
+fieldset.spoiler > legend
+{
+	font-size: 1.2em;
+}
+
+div.spoilerheader a
+{
+	font-family: sans-serif;
+	font-size: 1.1em;
+	font-weight: bold;
+}
+
+div.spoilerheader input 
+{
+	background-color: #cececc;
+	color: #3e3e33;
+	font: 0.9em sans-serif;
+}
+
+div.spoilerbody 
+{
+	color: #0f0f0f;
+	border: 1px dotted gray;
+	padding: 1em;
+	margin: 1em;
+}
+
+fieldset.spoiler div.spoilerbody 
+{
+	border: 0px;
+	padding: 0em;
+}

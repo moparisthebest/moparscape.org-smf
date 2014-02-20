@@ -601,4 +601,8 @@ $helptxt['custom_mask'] = 'The input mask is important for your forum\'s securit
 	</div><br /><br />
 	More information and advanced techniques may be found on the internet.';
 
+
+// Spoiler Tag Mod
+$helptxt['defaultSpoilerStyle'] = 'Set this to change the default type of spoiler used on the forum.';
+
 ?>

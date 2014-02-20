@@ -257,6 +257,19 @@ function template_settings()
 			'label' => $txt['hide_post_group'],
 			'description' => $txt['hide_post_group_desc'],
 		),
+
+		array(
+			'id' => 'spoiler_style',
+			'label' => $txt['spoiler_tag_label'],
+			'description' => $txt['spoiler_tag_desc'],
+			'options' => array(
+				0 => $txt['spoiler_tag_default'],
+				1 => $txt['spoiler_tag_onhoverovershow'],
+				2 => $txt['spoiler_tag_onlinkclickshow'],
+				3 => $txt['spoiler_tag_onbuttonclickshow'],
+			),
+			'type' => 'number',
+		),
 	'',
 		array(
 			'id' => 'show_bbc',

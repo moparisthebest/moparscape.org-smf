@@ -844,6 +844,87 @@ function shorten_subject($subject, $len)
 	// Shorten it by the length it was too long, and strip off junk from the end.
 	return $smcFunc['substr']($subject, 0, $len) . '...';
 }
+// Spoiler choosing function
+function build_spoiler($position, $topic = '')
+{
+	global $txt, $settings, $context, $modSettings;
+
+	// Optional topic if given
+	if($topic != '')
+		$topic = ': '.$topic;
+	
+	//Use global style if the theme-specific isn't set or is set to "follow global" (aka 0)
+	$spoilerTagStyle = isset($settings['spoiler_style']) ? $settings['spoiler_style'] : 0;
+	if($spoilerTagStyle == 0)
+    {
+		//Use "hover" if the global style isn't explicitly set
+		$spoilerTagStyle = isset($modSettings['defaultSpoilerStyle']) ? $modSettings['defaultSpoilerStyle'] : 1;
+	}
+
+	/*
+	Styles:
+	3: button
+	2: link
+	1: hover (default)
+	*/
+	$retval = '';
+
+	switch($position)
+    {
+		case 'before':
+			switch($spoilerTagStyle)
+            {
+				case 3:
+					$retval = (
+						'<div class="spoiler"><div class="spoilerheader">'.
+						'<input type="button" class="spoilerbutton" value="'.$txt['spoiler_tag_text'].$topic.'" '.
+						'onclick="n = this.parentNode.parentNode.lastChild;if(n.style.display == \'none\') {n.style.display = \'block\';} else {n.style.display = \'none\';} return false;"/> '.
+						$txt['spoiler_tag_click_info'].'</div><div class="spoilerbody" style="display: none">'
+					);
+				break;
+
+				case 2:
+					$retval = (
+						'<div class="spoiler"><div class="spoilerheader">'.
+						'<a href="javascript:void(0)" '.
+						'onclick="n = this.parentNode.parentNode.lastChild; if(n.style.display == \'none\') { n.style.display = \'block\'; } else {	n.style.display = \'none\';	} return false;">'.$txt['spoiler_tag_text'].$topic.'</a> '.
+						$txt['spoiler_tag_click_info'].'</div><div class="spoilerbody" style="display: none">'
+					);
+				break;
+
+				case 1:
+				default:
+					$retval = (
+						'<fieldset class="spoiler" '.
+						'onmouseover="this.lastChild.style.display = \'block\';" onmouseout="this.lastChild.style.display=\'none\'">'.
+						'<legend><b>'.$txt['spoiler_tag_text'].$topic.'</b> <small>'.$txt['spoiler_tag_hover_info'].'</small>'.
+						'</legend><div class="spoilerbody" style="display: none">'
+					);
+			}
+        break;
+
+		case 'after':
+			switch($spoilerTagStyle)
+            {
+				case 3:
+				case 2:
+					$retval = (
+						'</div></div>'
+					);
+				break;
+
+				case 1:
+				default:
+					$retval = (
+						'</div></fieldset>'
+					);
+                    
+			}
+			break;
+	}
+	return $retval;
+}
+
 
 // The current time with offset.
 function forum_time($use_user_offset = true, $timestamp = null)
@@ -1539,6 +1620,24 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'before' => '<sup>',
 				'after' => '</sup>',
 			),
+
+			array(
+				'tag' => 'spoiler',
+				'block_level' => true,
+				'before' => build_spoiler('before'),
+				'after' => build_spoiler('after'),
+				'disabled_before' => '<div style="display: none;">',
+				'disabled_after' => '</div>',
+				),
+			array(
+				'tag' => 'spoiler',
+				'type' => 'unparsed_equals',
+				'block_level' => true,
+				'before' => build_spoiler('before', "$1"),
+				'after' => build_spoiler('after'),
+				'disabled_before' => '<div style="display: none;">',
+				'disabled_after' => '</div>',
+				),
 			array(
 				'tag' => 'table',
 				'before' => '<table class="bbc_table">',

@@ -1014,22 +1014,24 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 		$smcFunc['db_free_result']($request);
 
 		// xxx Load the member's awards.
-		$request = $smcFunc['db_query']('', '
-			SELECT mem.id_member, mg.stars
-			FROM {db_prefix}membergroups AS mg, {db_prefix}members AS mem
-			WHERE (FIND_IN_SET(mg.id_group, mem.additional_groups) OR ( mg.id_group=mem.id_post_group AND mem.id_group != 0 ))
-				AND mg.showAddBadge=1 AND mg.stars != \'\'
-				AND id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
-			array(
-				'loaded_ids' => count($new_loaded_ids) == 1 ? $new_loaded_ids[0] : $new_loaded_ids,
-			)
-		);
+		if (!empty($new_loaded_ids)) {
+			$request = $smcFunc['db_query']('', '
+				SELECT mem.id_member, mg.stars
+				FROM {db_prefix}membergroups AS mg, {db_prefix}members AS mem
+				WHERE (FIND_IN_SET(mg.id_group, mem.additional_groups) OR ( mg.id_group=mem.id_post_group AND mem.id_group != 0 ))
+					AND mg.showAddBadge=1 AND mg.stars != \'\'
+					AND id_member' . (count($new_loaded_ids) == 1 ? ' = {int:loaded_ids}' : ' IN ({array_int:loaded_ids})'),
+				array(
+					'loaded_ids' => count($new_loaded_ids) == 1 ? $new_loaded_ids[0] : $new_loaded_ids,
+				)
+			);
 
-		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$user_profile[$row['id_member']]['stars'] .= ';'.$row['stars'];
+			while ($row = $smcFunc['db_fetch_assoc']($request))
+			{
+				$user_profile[$row['id_member']]['stars'] .= ';'.$row['stars'];
+			}
+			$smcFunc['db_free_result']($request);
 		}
-		$smcFunc['db_free_result']($request);
 		// xxx end Load the member's awards.
 	}
 

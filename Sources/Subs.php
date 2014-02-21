@@ -4187,9 +4187,9 @@ function setupMenuContext()
 					),
 				),
 			),
-			//xxx IRC Chat button
+			//xxx IRC button
 			'irc' => array(
-				'title' => 'IRC Chat',
+				'title' => 'Chat',
 				'href' => "//www.moparisthebest.com/irc.php?img=0&host=irc.moparscape.org&channel=moparscape".($context['user']['is_logged'] ? '&nick='.str_replace(" ","_",$context['user']['name']) : ''),
 				'show' => true,
 			),

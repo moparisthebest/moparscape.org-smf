@@ -204,7 +204,7 @@ function template_body_above()
 		echo $context['forum_name_html_safe'];
 	else
 		echo '
-				<img src="', $context['header_logo_url_html_safe'], '" alt="', $context['forum_name_html_safe'], '" />';
+				<a href="' . $scripturl . '"><img src="', $context['header_logo_url_html_safe'], '" alt="', $context['forum_name_html_safe'], '" /></a>';
 
 	echo '
 			</h1>

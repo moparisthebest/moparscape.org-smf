@@ -4190,7 +4190,8 @@ function setupMenuContext()
 			//xxx IRC Chat button
 			'irc' => array(
 				'title' => 'Chat',
-				'href' => "//www.moparisthebest.com/irc.php?img=0&host=irc.moparscape.org&channel=moparscape".($context['user']['is_logged'] ? '&nick='.str_replace(" ","_",$context['user']['name']) : ''),
+				#'href' => "//www.moparisthebest.com/irc.php?img=0&host=irc.moparscape.org&channel=moparscape".($context['user']['is_logged'] ? '&nick='.str_replace(" ","_",$context['user']['name']) : ''),
+				'href' => '/irc/?autoconnect=1&channel=moparscape'.($context['user']['is_logged'] ? '&nick='.str_replace(" ","_",$context['user']['name']) : ''),
 				'show' => true,
 			),
 			//xxx RS Wiki button

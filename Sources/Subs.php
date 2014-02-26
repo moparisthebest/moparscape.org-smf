@@ -4197,7 +4197,7 @@ function setupMenuContext()
 			//xxx RS Wiki button
 			'rswiki' => array(
 				'title' => 'RS Wiki',
-				'href' => "http://rswiki.moparisthebest.com/",
+				'href' => "//rswiki.moparisthebest.com/",
 				'show' => true,
 			),
 			'calendar' => array(

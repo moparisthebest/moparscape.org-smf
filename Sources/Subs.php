@@ -1712,14 +1712,14 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'youtube',
 				'type' => 'unparsed_content',
-				'content' => '<iframe style="border:0;" width="642" height="392" src="http://www.youtube.com/embed/$1" allowfullscreen></iframe>',
+				'content' => '<iframe style="border:0;" width="642" height="392" src="//www.youtube.com/embed/$1" allowfullscreen></iframe>',
 				'validate' => create_function('&$tag, &$data, $disabled', '
 				if (isset($disabled[\'url\']))
-					$tag[\'content\'] = \'http://www.youtube.com/watch?v=$1\';
+					$tag[\'content\'] = \'//www.youtube.com/watch?v=$1\';
 				$pattern = \'~(?:http|https|)(?::\/\/|)(?:www.|)(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/ytscreeningroom\?v=|\/feeds\/api\/videos\/|\/user\S*[^\w\-\s]|\S*[^\w\-\s]))([\w\-]{11})[a-z0-9;:@?&%=+\/\$_.-]*~i\';
 				if (preg_match($pattern, $data, $matches))
 					$data = $matches[1];'),
-				'disabled_content' => 'http://www.youtube.com/watch?v=$1',
+				'disabled_content' => '//www.youtube.com/watch?v=$1',
 			),
 			array(
 				'tag' => 'white',

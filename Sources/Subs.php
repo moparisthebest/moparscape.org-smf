@@ -1712,7 +1712,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'youtube',
 				'type' => 'unparsed_content',
-				'content' => '<iframe style="border:0;" width="642" height="392" src="http://www.youtube.com/embed/$1" allowfullscreen></iframe>',
+				'content' => '<iframe style="border:0;" width="642" height="392" src="https://www.youtube.com/embed/$1" allowfullscreen></iframe>',
 				'validate' => create_function('&$tag, &$data, $disabled', '
 				if (isset($disabled[\'url\']))
 					$tag[\'content\'] = \'http://www.youtube.com/watch?v=$1\';

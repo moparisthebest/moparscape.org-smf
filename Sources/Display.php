@@ -372,6 +372,18 @@ function Display()
 	censorText($topicinfo['subject']);
 	$context['page_title'] = $topicinfo['subject'];
 
+	// Is this already an article?
+	$request = $smcFunc['db_query']('','
+		SELECT id_message
+		FROM {db_prefix}sp_articles
+		WHERE id_message = {int:message}',
+		array(
+			'message' => $context['topic_first_message'],
+		)
+	);
+	list ($context['topic_is_article']) = $smcFunc['db_fetch_row']($request);
+	$smcFunc['db_free_result']($request);
+
 	// Is this topic sticky, or can it even be?
 	$topicinfo['is_sticky'] = empty($modSettings['enableStickyTopics']) ? '0' : $topicinfo['is_sticky'];
 

@@ -1824,6 +1824,7 @@ function prepareDBSettingContext(&$config_vars)
 	global $txt, $helptxt, $context, $modSettings, $sourcedir;
 
 	loadLanguage('Help');
+	loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));
 
 	$context['config_vars'] = array();
 	$inlinePermissions = array();

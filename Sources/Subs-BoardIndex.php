@@ -107,7 +107,7 @@ function getBoardIndex($boardIndexOptions)
 					'can_collapse' => isset($row_board['can_collapse']) && $row_board['can_collapse'] == 1,
 					'collapse_href' => isset($row_board['can_collapse']) ? $scripturl . '?action=collapse;c=' . $row_board['id_cat'] . ';sa=' . ($row_board['is_collapsed'] > 0 ? 'expand;' : 'collapse;') . $context['session_var'] . '=' . $context['session_id'] . '#c' . $row_board['id_cat'] : '',
 					'collapse_image' => isset($row_board['can_collapse']) ? '<img src="' . $settings['images_url'] . '/' . $context['theme_variant_url'] . ($row_board['is_collapsed'] > 0 ? 'expand.gif" alt="+"' : 'collapse.gif" alt="-"') . ' />' : '',
-					'href' => $scripturl . '#c' . $row_board['id_cat'],
+					'href' => $scripturl . '?action=forum#c' . $row_board['id_cat'],
 					'boards' => array(),
 					'new' => false
 				);

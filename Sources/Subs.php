@@ -969,7 +969,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 {
 	global $txt, $scripturl, $context, $modSettings, $user_info, $smcFunc;
 	static $bbc_codes = array(), $itemcodes = array(), $no_autolink_tags = array();
-	static $disabled;
+	static $disabled, $default_disabled, $parse_tag_cache;
 
 	// Don't waste cycles
 	if ($message === '')
@@ -993,15 +993,19 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	if (!isset($context['utf8']))
 		$context['utf8'] = (empty($modSettings['global_character_set']) ? $txt['lang_character_set'] : $modSettings['global_character_set']) === 'UTF-8';
 
+/*
 	// If we are not doing every tag then we don't cache this run.
 	if (!empty($parse_tags) && !empty($bbc_codes))
 	{
 		$temp_bbc = $bbc_codes;
 		$bbc_codes = array();
 	}
+*/
 
 	// Sift out the bbc for a performance improvement.
-	if (empty($bbc_codes) || $message === false || !empty($parse_tags))
+//	if (empty($bbc_codes) || $message === false || !empty($parse_tags))
+	// I wish I didn't had to do this... puff...
+	if (empty($bbc_codes) || $message === false)
 	{
 		if (!empty($modSettings['disabledBBC']))
 		{
@@ -1782,11 +1786,40 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		foreach ($codes as $code)
 		{
 			// If we are not doing every tag only do ones we are interested in.
-			if (empty($parse_tags) || in_array($code['tag'], $parse_tags))
+			// if (empty($parse_tags) || in_array($code['tag'], $parse_tags))
 				$bbc_codes[substr($code['tag'], 0, 1)][] = $code;
 		}
 		$codes = null;
 	}
+
+	if ($parse_tags !== array() && is_array($parse_tags))
+	{
+		$temp_bbc = $bbc_codes;
+		$tags_cache_id = implode(',', $parse_tags);
+
+		if (!isset($default_disabled))
+			$default_disabled = isset($disabled) ? $disabled : array();
+
+		if (isset($parse_tag_cache[$tags_cache_id]))
+			list ($bbc_codes, $disabled) = $parse_tag_cache[$tags_cache_id];
+		else
+		{
+			foreach ($bbc_codes as $key_bbc => $bbc)
+				foreach ($bbc as $key_code => $code)
+					if (!in_array($code['tag'], $parse_tags))
+					{
+						$disabled[$code['tag']] = true;
+						unset($bbc_codes[$key_bbc][$key_code]);
+					}
+
+			$parse_tag_cache = array($tags_cache_id => array($bbc_codes, $disabled));
+		}
+	}
+	elseif (isset($default_disabled))
+		$disabled = $default_disabled;
+
+	if (strpos($message, '[cutoff]') !== false)
+		$message = str_replace('[cutoff]', '', $message);
 
 	// Shall we take the time to cache this?
 	if ($cache_id != '' && !empty($modSettings['cache_enable']) && (($modSettings['cache_enable'] >= 2 && strlen($message) > 1000) || strlen($message) > 2400) && empty($parse_tags))
@@ -2522,7 +2555,11 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 			// For parsed content, we must recurse to avoid security problems.
 			if ($tag['type'] != 'unparsed_equals')
+			{
 				$data = parse_bbc($data, !empty($tag['parsed_tags_allowed']) ? false : true, '', !empty($tag['parsed_tags_allowed']) ? $tag['parsed_tags_allowed'] : array());
+				// Unfortunately, this is the only way to deal with such a failure of a function...
+				parse_bbc('sp');
+			}
 
 			$tag['after'] = strtr($tag['after'], array('$1' => $data));
 
@@ -2855,6 +2892,20 @@ function redirectexit($setLocation = '', $refresh = false)
 
 	$add = preg_match('~^(ftp|http)[s]?://~', $setLocation) == 0 && substr($setLocation, 0, 6) != 'about:';
 
+	// Set the default redirect location as the forum or the portal.
+	if ((empty($setLocation) || $scripturl == $setLocation) && ($modSettings['sp_portal_mode'] == 1 || $modSettings['sp_portal_mode'] == 3))
+	{
+		// Redirect the user to the forum.
+		if (!empty($modSettings['sp_disableForumRedirect']))
+			$setLocation = 'action=forum';
+		// Redirect the user to the SSI.php standalone portal.
+		elseif ($modSettings['sp_portal_mode'] == 3)
+		{
+			$setLocation = $context['portal_url'];
+			$add = false;
+		}
+	}
+
 	if (WIRELESS)
 	{
 		// Add the scripturl on if needed.
@@ -2881,9 +2932,9 @@ function redirectexit($setLocation = '', $refresh = false)
 	if (!empty($modSettings['queryless_urls']) && (empty($context['server']['is_cgi']) || @ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1) && (!empty($context['server']['is_apache']) || !empty($context['server']['is_lighttpd'])))
 	{
 		if (defined('SID') && SID != '')
-			$setLocation = preg_replace_callback('~"' . preg_quote($scripturl, '/') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic)=[^#]+?)(#[^"]*?)?$~', create_function('$m', 'global $scripturl; return $scripturl . \'/\' . strtr("$m[1]", \'&;=\', \'//,\') . \'.html?\' . SID . (isset($m[2]) ? "$m[2]" : "");'), $setLocation);
+			$setLocation = preg_replace_callback('~"' . preg_quote($scripturl, '/') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic|page)=[^#]+?)(#[^"]*?)?$~', create_function('$m', 'global $scripturl; return $scripturl . \'/\' . strtr("$m[1]", \'&;=\', \'//,\') . \'.html?\' . SID . (isset($m[2]) ? "$m[2]" : "");'), $setLocation);
 		else
-			$setLocation = preg_replace_callback('~"' . preg_quote($scripturl, '/') . '\?((?:board|topic)=[^#"]+?)(#[^"]*?)?$~', create_function('$m', 'global $scripturl; return $scripturl . \'/\' . strtr("$m[1]", \'&;=\', \'//,\') . \'.html\' . (isset($m[2]) ? "$m[2]" : "");'), $setLocation);
+			$setLocation = preg_replace_callback('~"' . preg_quote($scripturl, '/') . '\?((?:board|topic|page)=[^#"]+?)(#[^"]*?)?$~', create_function('$m', 'global $scripturl; return $scripturl . \'/\' . strtr("$m[1]", \'&;=\', \'//,\') . \'.html\' . (isset($m[2]) ? "$m[2]" : "");'), $setLocation);
 	}
 
 	// Maybe integrations want to change where we are heading?
@@ -4047,7 +4098,7 @@ function setupMenuContext()
 
 	// Set up the menu privileges.
 	$context['allow_search'] = allowedTo('search_posts');
-	$context['allow_admin'] = allowedTo(array('admin_forum', 'manage_boards', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_attachments', 'manage_smileys'));
+	$context['allow_admin'] = allowedTo(array('admin_forum', 'manage_boards', 'sp_admin', 'sp_manage_settings', 'sp_manage_blocks', 'sp_manage_articles', 'sp_manage_pages', 'sp_manage_shoutbox', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_attachments', 'manage_smileys'));
 	$context['allow_edit_profile'] = !$user_info['is_guest'] && allowedTo(array('profile_view_own', 'profile_view_any', 'profile_identity_own', 'profile_identity_any', 'profile_extra_own', 'profile_extra_any', 'profile_remove_own', 'profile_remove_any', 'moderate_forum', 'manage_membergroups', 'profile_title_own', 'profile_title_any'));
 	$context['allow_memberlist'] = allowedTo('view_mlist');
 	$context['allow_calendar'] = allowedTo('calendar_view') && !empty($modSettings['cal_enabled']);
@@ -4057,16 +4108,23 @@ function setupMenuContext()
 	$cacheTime = $modSettings['lastActive'] * 60;
 
 	// All the buttons we can possible want and then some, try pulling the final list of buttons from cache first.
-	if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
+	if (($menu_buttons = cache_get_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'] . '-' . empty($context['disable_sp']), $cacheTime)) === null || time() - $cacheTime <= $modSettings['settings_updated'])
 	{
 		$buttons = array(
 			'home' => array(
 				'title' => $txt['home'],
-				'href' => $scripturl,
+				'href' => $modSettings['sp_portal_mode'] == 3 && empty($context['disable_sp']) ? $modSettings['sp_standalone_url'] : $scripturl,
 				'show' => true,
 				'sub_buttons' => array(
 				),
 				'is_last' => $context['right_to_left'],
+			),
+			'forum' => array(
+				'title' => empty($txt['sp-forum']) ? 'Forum' : $txt['sp-forum'],
+				'href' => $scripturl . ($modSettings['sp_portal_mode'] == 1 && empty($context['disable_sp']) ? '?action=forum' : ''),
+				'show' => in_array($modSettings['sp_portal_mode'], array(1, 3)) && empty($context['disable_sp']),
+				'sub_buttons' => array(
+				),
 			),
 			//xxx show archived boards, commented out for Tom :)
 			/*
@@ -4301,7 +4359,7 @@ function setupMenuContext()
 			}
 
 		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
-			cache_put_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $menu_buttons, $cacheTime);
+			cache_put_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'] . '-' . empty($context['disable_sp']), $menu_buttons, $cacheTime);
 	}
 
 	$context['menu_buttons'] = $menu_buttons;
@@ -4312,7 +4370,7 @@ function setupMenuContext()
 
 	// Figure out which action we are doing so we can set the active tab.
 	// Default to home.
-	$current_action = 'home';
+	$current_action = $modSettings['sp_portal_mode'] == 3 && empty($context['standalone']) && empty($context['disable_sp']) ? 'forum' : 'home';
 
 	if (isset($context['menu_buttons'][$context['current_action']]))
 		$current_action = $context['current_action'];
@@ -4320,6 +4378,8 @@ function setupMenuContext()
 		$current_action = 'search';
 	elseif ($context['current_action'] == 'theme')
 		$current_action = isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? 'profile' : 'admin';
+	elseif(empty($context['disable_sp']) && ((isset($_GET['board']) || isset($_GET['topic']) || in_array($context['current_action'], array('unread', 'unreadreplies', 'recent', 'stats', 'who'))) && in_array($modSettings['sp_portal_mode'], array(1, 3))))
+		$current_action = 'forum';
 	elseif ($context['current_action'] == 'register2')
 		$current_action = 'register';
 	elseif ($context['current_action'] == 'login2' || ($user_info['is_guest'] && $context['current_action'] == 'reminder'))

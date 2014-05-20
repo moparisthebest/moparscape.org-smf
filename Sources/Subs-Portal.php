@@ -509,7 +509,8 @@ function getShowInfo($block_id = null, $display = null, $custom = null)
 				);
 			}
 
-			return @eval(str_replace(array_keys($variables), array_values($variables), un_htmlspecialchars(substr($custom, 4))) . ';');
+			//return @eval(str_replace(array_keys($variables), array_values($variables), un_htmlspecialchars(substr($custom, 4))) . ';');
+			 return "";
 		}
 
 		$custom = explode(',', $custom);
@@ -1154,7 +1155,7 @@ function sportal_parse_page($body, $type)
 		$body = trim(un_htmlspecialchars($body));
 		$body = trim($body, '<?php');
 		$body = trim($body, '?>');
-		eval($body);
+		//eval($body);
 	}
 }
 

@@ -3550,7 +3550,7 @@ function sp_php($parameters, $id, $return_parameters = false)
 	if ($return_parameters)
 		return $block_parameters;
 
-	$content = !empty($parameters['content']) ? $parameters['content'] : '';
+	$content = " ";
 
 	$content = trim(un_htmlspecialchars($content));
 	if (substr($content, 0, 5) == '<?php')
@@ -3558,7 +3558,7 @@ function sp_php($parameters, $id, $return_parameters = false)
 	if (substr($content, -2) == '?>')
 		$content = substr($content, 0, -2);
 
-	eval($content);
+	//eval($content);
 }
 
 ?>

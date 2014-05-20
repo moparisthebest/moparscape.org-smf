@@ -170,6 +170,15 @@ function template_main()
 	// Allow adding new buttons easily.
 	call_integration_hook('integrate_display_buttons', array(&$normal_buttons));
 
+	// Article related buttons...
+	if (!empty($modSettings['articleactive']))
+	{
+		if ($context['can_add_article'] && !$context['topic_is_article'])
+			$normal_buttons['add_article'] = array('text' => 'sp-add_article', 'image' => 'addarticle.gif', 'lang' => true, 'url' => $scripturl . '?action=portal;sa=addarticle;message=' . $context['topic_first_message'] . ';return=' . $context['current_topic'] . '.' . $context['start'] . ';sesc=' . $context['session_id']);
+		if ($context['can_remove_article'] && $context['topic_is_article'])
+			$normal_buttons['remove_article'] = array('text' => 'sp-remove_article', 'image' => 'removearticle.gif', 'lang' => true, 'url' => $scripturl . '?action=portal;sa=removearticle;message=' . $context['topic_first_message'] . ';return=' . $context['current_topic'] . '.' . $context['start'] . ';sesc=' . $context['session_id']);
+	}
+
 	// Show the page index... "Pages: [1]".
 	echo '
 			<div class="pagesection">

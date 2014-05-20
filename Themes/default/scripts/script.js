@@ -1070,7 +1070,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 
 		oOption = document.createElement('option');
 		oOption.appendChild(document.createTextNode((aBoardsAndCategories[i].isCategory ? this.opt.sCatPrefix : sChildLevelPrefix + this.opt.sBoardPrefix) + aBoardsAndCategories[i].name));
-		oOption.value = aBoardsAndCategories[i].isCategory ? '#c' + aBoardsAndCategories[i].id : '?board=' + aBoardsAndCategories[i].id + '.0';
+		oOption.value = aBoardsAndCategories[i].isCategory ? '?action=forum#c' + aBoardsAndCategories[i].id : '?board=' + aBoardsAndCategories[i].id + '.0';
 		oListFragment.appendChild(oOption);
 
 		if (aBoardsAndCategories[i].isCategory)

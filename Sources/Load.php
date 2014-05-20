@@ -1401,6 +1401,19 @@ function loadTheme($id_theme = 0, $initialize = true)
 	else
 		$id_theme = $modSettings['theme_guests'];
 
+	global $sp_standalone;
+
+	// Maybe we have a portal specific theme?
+	if (!isset($_GET['action']) && !isset($_GET['board']) && !isset($_GET['topic']) && ($modSettings['sp_portal_mode'] == 1 || !empty($sp_standalone)) && !empty($modSettings['portaltheme']))
+		$id_theme = (int) $modSettings['portaltheme'];
+
+	// SMF doesn't seem to be liking -1...
+	if ($id_theme == -1 && !empty($_SESSION['id_theme']))
+	{
+		unset($_SESSION['id_theme']);
+		$id_theme = $modSettings['theme_guests'];
+	}
+
 	// Verify the id_theme... no foul play.
 	// Always allow the board specific theme, if they are overriding.
 	if (!empty($board_info['theme']) && $board_info['override_theme'])
@@ -1654,6 +1667,12 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'quotefast',
 		'spellcheck',
 	);
+
+	// We'll be on the safe side, and load our language here!
+	loadLanguage('SPortal', '', false);
+	$cur_language = isset($user_info['language']) ? $user_info['language'] : $language;
+	if ($cur_language !== 'english')
+		loadLanguage('SPortal', 'english', false);
 
 	// Wireless mode?  Load up the wireless stuff.
 	if (WIRELESS)

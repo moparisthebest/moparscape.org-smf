@@ -64,6 +64,7 @@ require_once($sourcedir . '/Subs.php');
 require_once($sourcedir . '/Errors.php');
 require_once($sourcedir . '/Load.php');
 require_once($sourcedir . '/Security.php');
+require_once($sourcedir . '/Subs-Portal.php');
 
 // Using an pre-PHP 5.1 version?
 if (@version_compare(PHP_VERSION, '5.1') == -1)
@@ -143,6 +144,9 @@ loadPermissions();
 
 // Load the current or SSI theme. (just use $ssi_theme = id_theme;)
 loadTheme(isset($ssi_theme) ? (int) $ssi_theme : 0);
+
+// Load some SP stuff.
+sportal_init();
 
 // Take care of any banning that needs to be done.
 if (isset($_REQUEST['ssi_ban']) || (isset($ssi_ban) && $ssi_ban === true))

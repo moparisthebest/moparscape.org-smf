@@ -81,6 +81,8 @@ function ShowAdminHelp()
 
 	// Load the admin help language file and template.
 	loadLanguage('Help');
+	// Load the Simple Portal Help file.
+	loadLanguage('SPortalHelp', sp_languageSelect('SPortalHelp'));
 
 	// Permission specific help?
 	if (isset($_GET['help']) && substr($_GET['help'], 0, 14) == 'permissionhelp')

@@ -222,6 +222,13 @@ td.sp_shop
 {
 	margin: 5px 10px 0 0;
 }
+
+/* Overlap fix */
+.sp_article_content .post {
+	margin-right: -50px;
+	word-wrap: break-word;
+}
+
 .sp_article_content
 {
 	margin-bottom: 0.5em;

@@ -1143,12 +1143,35 @@ function loadMemberContext($user, $display_custom_fields = false)
 		if (count($stars) > 0) {
 			$group_stars .= '</li><li><table>';
 			$count = 0;
+			// Change this as you see fit...
+			$badgeTooltips = array(
+				'c.png' => 'C Guru', 'onix.gif' => 'Web Developer', 'python.png' => 'Python Guru',
+				'csharp.png' => 'C# Guru', 'togepi.gif' => 'C++ Coder', 'lisp.png' => 'Lisp Guru',
+				'duke3d.gif' => 'Java Guru', 'Flare.gif' => 'Delphi Coder', 'Kakuna.gif' => 'VB Coder',
+				'SOTWWinner.png' => 'SOTW Winner', 'arccup.gif' => 'AutoRune Crew', 'batman.gif' => 'Batman',
+				'builder.png' => 'MoparCraft Builder', 'bulbasaur.gif' => 'MoparScape Moderator',
+				'caterpie.gif' => 'Programming Moderator', 'charmander.gif' => 'Other Moderator',
+				'codeguru.png' => 'Code Guru', 'dragonite.gif' => 'IRC Addict', 'dragonite.orig.gif' => 'IRC Legend',
+				'duke3dchristmas.gif' => 'Java Guru', 'irishbulbasaur.gif' => 'MoparScape Moderator',
+				'irishpika.gif' => 'Staff', 'javacoder.png' => 'Java Coder', 'lapras.gif' => 'Graphics Master',
+				'lpotm.png' => 'LPOTM Winner', 'mcwaward.png' => 'MoparScape MCW', 'mdgsharp.png' => 'GameDev Moderator',
+				'mgd_winner.gif' => 'GameDev Winner', 'moparcraft.gif' => 'MoparCraft Staff',
+				'moparcraft_admin.png' => 'MoparCraft Admin', 'persian.gif' => 'Games Moderator',
+				'pikaadmin.gif' => 'Administrator', 'pikagmod.gif' => 'Global Moderator',
+				'pikastaff.gif' => 'Staff', 'pikastaff36.gif' => 'Staff', 'pinan2.gif' => 'RS2 Moderator',
+				'pvper.gif' => 'Moparcraft PVPer', 'redstone_engineer.png' => 'Redstone Engineer',
+				'santabulbasaur.gif' => 'MoparScape Moderator', 'santapika.gif' => 'Staff', 'scarcup.gif' => 'Scar Scripter',
+				'scarmod.gif' => 'SCAR Moderator', 'simba.gif' => 'Simba Scripter', 'sotw.png' =>'SOTW Winner',
+				'spleef.png' => 'Spleef Champion', 'squirtle.gif' => 'Ex-Staff', 'srldev.gif' => 'SRL Developer',
+				'srldevold.gif' => 'SRL Developer', 'tutauth.png' => 'Tutorial Author', 'valentinemscpmod.png' => 'MoparScape Moderator',
+				'valentinepika.gif' => 'Staff', 'vulpex.gif' => 'General Moderator', 'yohelp.png' => 'Server Helper'
+			);
 			foreach ($stars as $badge) {
 		 		$badge = explode('#', $badge);
 				if ($count % 3 == 0)
 					$group_stars .= '<tr>';
 
-				$group_stars .= '<td><img src="' . str_replace('$language', $context['user']['language'], isset($badge[1]) ? $settings['images_url'] . '/' . $badge[1] : '') . '" alt="*" border="0" /></td>';
+				$group_stars .= '<td><img src="' . str_replace('$language', $context['user']['language'], isset($badge[1]) ? $settings['images_url'] . '/' . $badge[1] : '') . '" alt="*" title="' . ((isset($badgeTooltips[$badge[1]])) ? $badgeTooltips[$badge[1]] : '') . '" border="0" /></td>';
 				$count++;
 				if ($count % 3 == 0)
 					$group_stars .= '</tr>';

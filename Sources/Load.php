@@ -1139,7 +1139,8 @@ function loadMemberContext($user, $display_custom_fields = false)
 		$stars = explode(';', $profile['stars']);
 		$star = explode('#', $stars[0]);
 		$group_stars = str_repeat('<img src="' . str_replace('$language', $context['user']['language'], isset($star[1]) ? $settings['images_url'] . '/' . $star[1] : '') . '" alt="*" border="0" />', empty($star[0]) || empty($star[1]) ? 0 : $star[0]);
-		$badges = array_shift($stars);
+		// Remove first element in $stars to get the badges.
+		array_shift($stars);
 		if (count($stars) > 0) {
 			$group_stars .= '</li><li><table>';
 			$count = 0;

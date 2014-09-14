@@ -1142,7 +1142,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 		// Remove first element in $stars to get the badges.
 		array_shift($stars);
 		if (count($stars) > 0) {
-			$group_stars .= '</li><li><table>';
+			$group_stars .= '</li><li><div style="overflow: auto;"><table>';
 			$count = 0;
 			// Change this as you see fit...
 			$badgeTooltips = array(
@@ -1178,7 +1178,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 					$group_stars .= '</tr>';
 	 		}
 
-			$group_stars .= '</table></li>';
+			$group_stars .= '</table></div></li>';
 		}
 	}
 	// xxx end changed for awards

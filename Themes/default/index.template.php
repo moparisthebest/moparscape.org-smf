@@ -409,7 +409,7 @@ function template_html_below()
 {
 	global $context, $settings, $options, $scripturl, $txt, $modSettings;
 
-	echo '<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/count.min.js" defer="defer"></script>
+	echo '
 </body></html>';
 }
 

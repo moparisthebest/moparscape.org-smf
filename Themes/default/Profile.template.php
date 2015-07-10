@@ -2549,6 +2549,11 @@ function template_profile_signature_modify()
 											setTimeout("tick()", 800);
 									}
 
+									function parseBaby(text) {
+										var babyless = new RegExp(/\[(\w+)[^w]*?](.*?)\[\/\1]/g);
+										return text.replace(babyless, "$2");
+									}
+									
 									function calcCharLeft()
 									{
 										var maxLength = ', $context['signature_limits']['max_length'], ';
@@ -2561,12 +2566,15 @@ function template_profile_signature_modify()
 										{
 											oldSignature = currentSignature;
 
-											if (currentSignature.replace(/\r/, "").length > maxLength)
-												document.forms.creator.signature.value = currentSignature.replace(/\r/, "").substring(0, maxLength);
+											if (parseBaby(currentSignature.replace(/\r/, "")).length > maxLength) {
+												var diff = currentSignature.replace(/\r/, "").length - parseBaby(currentSignature.replace(/\r/, "")).length;
+												document.forms.creator.signature.value = currentSignature.replace(/\r/, "").substring(0, maxLength+diff);
+											}
 											currentSignature = document.forms.creator.signature.value.replace(/\r/, "");
 										}
-
-										setInnerHTML(document.getElementById("signatureLeft"), maxLength - currentSignature.length);
+										var size = parseBaby(currentSignature).length;
+										console.log(size);
+										setInnerHTML(document.getElementById("signatureLeft"), maxLength - size);
 									}
 
 									addLoadEvent(tick);

@@ -2892,7 +2892,7 @@ function profileValidateSignature(&$value)
 
 		$unparsed_signature = strtr(un_htmlspecialchars($value), array("\r" => '', '&#039' => '\''));
 		// Too long?
-		if (!empty($sig_limits[1]) && $smcFunc['strlen']($unparsed_signature) > $sig_limits[1])
+		if (!empty($sig_limits[1]) && (!empty($sig_bbc) ? ($smcFunc['strlen']($unparsed_signature) - $smcFunc['strlen']($sig_bbc)) : $smcFunc['strlen']($unparsed_signature)) > $sig_limits[1])
 		{
 			$_POST['signature'] = trim(htmlspecialchars($smcFunc['substr']($unparsed_signature, 0, $sig_limits[1]), ENT_QUOTES));
 			$txt['profile_error_signature_max_length'] = sprintf($txt['profile_error_signature_max_length'], $sig_limits[1]);

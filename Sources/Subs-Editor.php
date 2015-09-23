@@ -8,7 +8,7 @@
  * @copyright 2011 Simple Machines
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.0.7
+ * @version 2.0.11
  */
 
 if (!defined('SMF'))
@@ -132,7 +132,7 @@ function bbc_to_html($text)
 	$text = preg_replace(array_keys($working_html), array_values($working_html), $text);
 
 	// Parse unique ID's and disable javascript into the smileys - using the double space.
-	$text = preg_replace_callback('~(?:\s|&nbsp;)?<(img\ssrc="' . preg_quote($modSettings['smileys_url'], '~') . '/[^<>]+?/([^<>]+?)"\s*)[^<>]*?class="smiley" />~', create_function('$m', 'static $i = 1; return \'<\' . ' . 'stripslashes($m[1]) . \'alt="" title="" onresizestart="return false;" id="smiley_\' . ' . "\$" . 'i++ . \'_\' . $m[2] . \'" style="padding: 0 3px 0 3px;" />\';'), $text);
+	$text = preg_replace_callback('~(?:\s|&nbsp;)?<(img\ssrc="' . preg_quote($modSettings['smileys_url'], '~') . '/[^<>]+?/([^<>]+?)"\s*)[^<>]*?class="smiley" />~', 'uniq_smiley__preg_callback', $text);
 
 	return $text;
 }
@@ -804,7 +804,7 @@ function html_to_bbc($text)
 		'~<ins(\s(.)*?)*?' . '>~i' => "&lt;ins&gt;",
 		'~</ins>~i' => "&lt;/ins&gt;",
 	);
-	$text = preg_replace_callback('~<(td|th)\s[^<>]*?colspan="?(\d{1,2})"?.*?' . '>~i', create_function('$m', 'return str_repeat(\'[td][/td]\', $m[2] - 1) . \'[td]\';'), $text);
+	$text = preg_replace_callback('~<(td|th)\s[^<>]*?colspan="?(\d{1,2})"?.*?' . '>~i', 'td_count__preg_callback', $text);
 	$text = preg_replace(array_keys($tags), array_values($tags), $text);
 
 	// Please give us just a little more time.
@@ -2130,7 +2130,7 @@ function AutoSuggestHandler($checkRegistered = null)
 	loadTemplate('Xml');
 
 	// Any parameters?
-	$context['search_param'] = isset($_REQUEST['search_param']) ? unserialize(base64_decode($_REQUEST['search_param'])) : array();
+	$context['search_param'] = isset($_REQUEST['search_param']) ? safe_unserialize(base64_decode($_REQUEST['search_param'])) : array();
 
 	if (isset($_REQUEST['suggest_type'], $_REQUEST['search']) && isset($searchTypes[$_REQUEST['suggest_type']]))
 	{
@@ -2183,4 +2183,14 @@ function AutoSuggest_Search_Member()
 	return $xml_data;
 }
 
+function uniq_smiley__preg_callback($matches)
+{
+	static $i = 1;
+	return '<' . stripslashes($matches[1]) . 'alt="" title="" onresizestart="return false;" id="smiley_' . ($i++) . '_' . $matches[2] . '" style="padding: 0 3px 0 3px;" />';
+}
+
+function td_count__preg_callback($matches)
+{
+	return str_repeat('[td][/td]', $matches[2] - 1) . '[td]';
+}
 ?>

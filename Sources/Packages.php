@@ -8,7 +8,7 @@
  * @copyright 2011 Simple Machines
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.0.2
+ * @version 2.0.11
  */
 
 if (!defined('SMF'))
@@ -353,6 +353,7 @@ function PackageInstallTest()
 			if (!empty($action['parse_bbc']))
 			{
 				require_once($sourcedir . '/Subs-Post.php');
+				$context['package_readme'] = preg_replace('~\[[/]?html\]~i', '', $context['package_readme']);
 				preparsecode($context['package_readme']);
 				$context['package_readme'] = parse_bbc($context['package_readme']);
 			}
@@ -954,7 +955,7 @@ function PackageInstall()
 			elseif ($action['type'] == 'redirect' && !empty($action['redirect_url']))
 			{
 				$context['redirect_url'] = $action['redirect_url'];
-				$context['redirect_text'] = !empty($action['filename']) && file_exists($boarddir . '/Packages/temp/' . $context['base_path'] . $action['filename']) ? file_get_contents($boarddir . '/Packages/temp/' . $context['base_path'] . $action['filename']) : ($context['uninstalling'] ? $txt['package_uninstall_done'] : $txt['package_installed_done']);
+				$context['redirect_text'] = !empty($action['filename']) && file_exists($boarddir . '/Packages/temp/' . $context['base_path'] . $action['filename']) ? $smcFunc['htmlspecialchars'](file_get_contents($boarddir . '/Packages/temp/' . $context['base_path'] . $action['filename'])) : ($context['uninstalling'] ? $txt['package_uninstall_done'] : $txt['package_installed_done']);
 				$context['redirect_timeout'] = $action['redirect_timeout'];
 
 				// Parse out a couple of common urls.
@@ -1055,6 +1056,14 @@ function PackageInstall()
 			// What failed steps?
 			$failed_step_insert = serialize($failed_steps);
 
+			// Un-sanitize things before we insert them...
+			$keys = array('filename', 'name', 'id', 'version');
+			foreach ($keys as $key)
+			{
+				// Yay for variable variables...
+				${"package_$key"} = un_htmlspecialchars($packageInfo[$key]);
+			}
+
 			$smcFunc['db_insert']('',
 				'{db_prefix}log_packages',
 				array(
@@ -1064,7 +1073,7 @@ function PackageInstall()
 					'member_removed' => 'int', 'db_changes' => 'string',
 				),
 				array(
-					$packageInfo['filename'], $packageInfo['name'], $packageInfo['id'], $packageInfo['version'],
+					$package_filename, $package_name, $package_id, $package_version,
 					$user_info['id'], $user_info['name'], time(),
 					$is_upgrade ? 2 : 1, $failed_step_insert, $themes_installed,
 					0, $db_changes,
@@ -1099,7 +1108,7 @@ function PackageInstall()
 		deltree($boarddir . '/Packages/temp');
 
 	// Log what we just did.
-	logAction($context['uninstalling'] ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => $smcFunc['htmlspecialchars']($packageInfo['name']), 'version' => $smcFunc['htmlspecialchars']($packageInfo['version'])), 'admin');
+	logAction($context['uninstalling'] ? 'uninstall_package' : (!empty($is_upgrade) ? 'upgrade_package' : 'install_package'), array('package' => $packageInfo['name'], 'version' => $packageInfo['version']), 'admin');
 
 	// Just in case, let's clear the whole cache to avoid anything going up the swanny.
 	clean_cache();
@@ -1783,7 +1792,7 @@ function PackagePermissions()
 	// Have we got a load of back-catalogue trees to expand from a submit etc?
 	if (!empty($_GET['back_look']))
 	{
-		$potententialTrees = unserialize(base64_decode($_GET['back_look']));
+		$potententialTrees = safe_unserialize(base64_decode($_GET['back_look']));
 		foreach ($potententialTrees as $tree)
 			$context['look_for'][] = $tree;
 	}
@@ -2032,7 +2041,7 @@ function PackagePermissionsAction()
 
 		// Continuing?
 		if (isset($_POST['toProcess']))
-			$_POST['permStatus'] = unserialize(base64_decode($_POST['toProcess']));
+			$_POST['permStatus'] = safe_unserialize(base64_decode($_POST['toProcess']));
 
 		if (isset($_POST['permStatus']))
 		{
@@ -2112,7 +2121,7 @@ function PackagePermissionsAction()
 		$context['predefined_type'] = isset($_POST['predefined']) ? $_POST['predefined'] : 'restricted';
 
 		$context['total_items'] = isset($_POST['totalItems']) ? (int) $_POST['totalItems'] : 0;
-		$context['directory_list'] = isset($_POST['dirList']) ? unserialize(base64_decode($_POST['dirList'])) : array();
+		$context['directory_list'] = isset($_POST['dirList']) ? safe_unserialize(base64_decode($_POST['dirList'])) : array();
 
 		$context['file_offset'] = isset($_POST['fileOffset']) ? (int) $_POST['fileOffset'] : 0;
 
@@ -2174,7 +2183,7 @@ function PackagePermissionsAction()
 		elseif ($context['predefined_type'] == 'free')
 			$context['special_files'] = array();
 		else
-			$context['special_files'] = unserialize(base64_decode($_POST['specialFiles']));
+			$context['special_files'] = safe_unserialize(base64_decode($_POST['specialFiles']));
 
 		// Now we definitely know where we are, we need to go through again doing the chmod!
 		foreach ($context['directory_list'] as $path => $dummy)

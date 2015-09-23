@@ -602,16 +602,7 @@ smc_Editor.prototype.insertText = function(sText, bClear, bForceEntityReverse, i
 			// This includes a work around for FF to get the cursor to show!
 			this.oFrameDocument.body.innerHTML = sText;
 
-			// If FF trick the cursor into coming back!
-			if (is_ff || is_opera)
-			{
-				// For some entirely unknown reason FF3 Beta 2 and some Opera versions
-				// require this.
-				this.oFrameDocument.body.contentEditable = false;
-
-				this.oFrameDocument.designMode = 'off';
-				this.oFrameDocument.designMode = 'on';
-			}
+			// This used to be the home of a slightly ugly bug in Firefox (but it's long gone)
 		}
 		else
 			this.oTextHandle.value = sText;

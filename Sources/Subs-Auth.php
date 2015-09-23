@@ -8,7 +8,7 @@
  * @copyright 2011 Simple Machines
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.0.7
+ * @version 2.0.11
  */
 
 if (!defined('SMF'))
@@ -111,7 +111,7 @@ function setLoginCookie($cookie_length, $id, $password = '')
 	$cookie_state = (empty($modSettings['localCookies']) ? 0 : 1) | (empty($modSettings['globalCookies']) ? 0 : 2);
 	if (isset($_COOKIE[$cookiename]) && preg_match('~^a:[34]:\{i:0;(i:\d{1,6}|s:[1-8]:"\d{1,8}");i:1;s:(0|40):"([a-fA-F0-9]{40})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~', $_COOKIE[$cookiename]) === 1)
 	{
-		$array = @unserialize($_COOKIE[$cookiename]);
+		$array = safe_unserialize($_COOKIE[$cookiename]);
 
 		// Out with the old, in with the new!
 		if (isset($array[3]) && $array[3] != $cookie_state)
@@ -242,7 +242,7 @@ function KickGuest()
 // Display a message about the forum being in maintenance mode, etc.
 function InMaintenance()
 {
-	global $txt, $mtitle, $mmessage, $context;
+	global $txt, $mtitle, $mmessage, $context, $smcFunc;
 
 	loadLanguage('Login');
 	loadTemplate('Login');
@@ -252,7 +252,7 @@ function InMaintenance()
 
 	// Basic template stuff..
 	$context['sub_template'] = 'maintenance';
-	$context['title'] = &$mtitle;
+	$context['title'] = $smcFunc['htmlspecialchars']($mtitle);
 	$context['description'] = &$mmessage;
 	$context['page_title'] = $txt['maintain_mode'];
 }

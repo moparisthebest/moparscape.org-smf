@@ -8,7 +8,7 @@
  * @copyright 2011 Simple Machines
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.0
+ * @version 2.0.11
  */
 
 if (!defined('SMF'))
@@ -272,7 +272,7 @@ function smf_openID_return()
 		fatal_lang_error('openid_load_data');
 
 	// Any save fields to restore?
-	$context['openid_save_fields'] = isset($_GET['sf']) ? unserialize(base64_decode($_GET['sf'])) : array();
+	$context['openid_save_fields'] = isset($_GET['sf']) ? safe_unserialize(base64_decode($_GET['sf'])) : array();
 
 	// Is there a user with this OpenID_uri?
 	$result = $smcFunc['db_query']('', '

@@ -8,7 +8,7 @@
  * @copyright 2011 Simple Machines
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.0
+ * @version 2.0.10
  */
 
 if (!defined('SMF'))
@@ -368,11 +368,11 @@ function smf_db_change_column($table_name, $old_column, $column_info, $parameter
 		if (!$column_info['null'])
 		{
 			// We have to set it to something if we are making it NOT NULL.
-			$setTo = isset($column_info['default']) ? $column_info['default'] : '';
+			$setTo = isset($column_info['default']) ? $column_info['default'] : (strpos($old_info['type'], 'int') !== false ? 0 : '');
 			$smcFunc['db_query']('', '
 				UPDATE ' . $table_name . '
 				SET ' . $column_info['name'] . ' = \'' . $setTo . '\'
-				WHERE ' . $column_info['name'] . ' = NULL',
+				WHERE ' . $column_info['name'] . ' IS NULL',
 				array(
 					'security_override' => true,
 				)

@@ -8,7 +8,7 @@
  * @copyright 2011 Simple Machines
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.0.7
+ * @version 2.0.11
  */
 
 if (!defined('SMF'))
@@ -107,7 +107,7 @@ function ViewModlog()
 	if (!empty($_REQUEST['params']) && empty($_REQUEST['is_search']))
 	{
 		$search_params = base64_decode(strtr($_REQUEST['params'], array(' ' => '+')));
-		$search_params = @unserialize($search_params);
+		$search_params = safe_unserialize($search_params);
 	}
 
 	// This array houses all the valid search types.

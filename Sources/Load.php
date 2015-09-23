@@ -8,7 +8,7 @@
  * @copyright 2011 Simple Machines
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.0.7
+ * @version 2.0.11
  */
 
 if (!defined('SMF'))
@@ -180,7 +180,41 @@ function reloadSettings()
 			return $num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num === 0x202E || $num === 0x202D ? \'\' : \'&#\' . $num . \';\';'),
 		'htmlspecialchars' => create_function('$string, $quote_style = ENT_COMPAT, $charset = \'ISO-8859-1\'', '
 			global $smcFunc;
-			return ' . strtr($ent_check[0], array('&' => '&amp;')) . 'htmlspecialchars($string, $quote_style, ' . ($utf8 ? '\'UTF-8\'' : '$charset') . ')' . $ent_check[1] . ';'),
+			return ' . ($utf8 ? '$smcFunc[\'fix_utf8mb4\'](' : '') . strtr($ent_check[0], array('&' => '&amp;')) . 'htmlspecialchars($string, $quote_style, ' . ($utf8 ? '\'UTF-8\'' : '$charset') . ')' . $ent_check[1] . ($utf8 ? ')' : '') . ';'),
+		'fix_utf8mb4' => create_function('$string', '
+			$i = 0;
+			$len = strlen($string);
+			$new_string = \'\';
+			while ($i < $len)
+			{
+				$ord = ord($string[$i]);
+				if ($ord < 128)
+				{
+					$new_string .= $string[$i];
+					$i++;
+				}
+				elseif ($ord < 224)
+				{
+					$new_string .= $string[$i] . $string[$i+1];
+					$i += 2;
+				}
+				elseif ($ord < 240)
+				{
+					$new_string .= $string[$i] . $string[$i+1] . $string[$i+2];
+					$i += 3;
+				}
+				elseif ($ord < 248)
+				{
+					// Magic happens.
+					$val = (ord($string[$i]) & 0x07) << 18;
+					$val += (ord($string[$i+1]) & 0x3F) << 12;
+					$val += (ord($string[$i+2]) & 0x3F) << 6;
+					$val += (ord($string[$i+3]) & 0x3F);
+					$new_string .= \'&#\' . $val . \';\';
+					$i += 4;
+				}
+			}
+			return $new_string;'),
 		'htmltrim' => create_function('$string', '
 			global $smcFunc;
 			return preg_replace(\'~^(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+|(?:[ \t\n\r\x0B\x00' . $space_chars . ']|&nbsp;)+$~' . ($utf8 ? 'u' : '') . '\', \'\', ' . implode('$string', $ent_check) . ');'),
@@ -325,7 +359,7 @@ function loadUserSettings()
 		// Fix a security hole in PHP 4.3.9 and below...
 		if (preg_match('~^a:[34]:\{i:0;(i:\d{1,6}|s:[1-8]:"\d{1,8}");i:1;s:(0|40):"([a-fA-F0-9]{40})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~i', $_COOKIE[$cookiename]) == 1)
 		{
-			list ($id_member, $password) = @unserialize($_COOKIE[$cookiename]);
+			list ($id_member, $password) = safe_unserialize($_COOKIE[$cookiename]);
 			$id_member = !empty($id_member) && strlen($password) > 0 ? (int) $id_member : 0;
 		}
 		else
@@ -334,7 +368,7 @@ function loadUserSettings()
 	elseif (empty($id_member) && isset($_SESSION['login_' . $cookiename]) && ($_SESSION['USER_AGENT'] == $_SERVER['HTTP_USER_AGENT'] || !empty($modSettings['disableCheckUA'])))
 	{
 		// !!! Perhaps we can do some more checking on this, such as on the first octet of the IP?
-		list ($id_member, $password, $login_span) = @unserialize($_SESSION['login_' . $cookiename]);
+		list ($id_member, $password, $login_span) = safe_unserialize($_SESSION['login_' . $cookiename]);
 		$id_member = !empty($id_member) && strlen($password) == 40 && $login_span > time() ? (int) $id_member : 0;
 	}
 
@@ -2699,12 +2733,21 @@ function cache_put_data($key, $value, $ttl = 120)
 		else
 		{
 			$cache_data = '<' . '?' . 'php if (!defined(\'SMF\')) die; if (' . (time() + $ttl) . ' < time()) $expired = true; else{$expired = false; $value = \'' . addcslashes($value, '\\\'') . '\';}' . '?' . '>';
+			// Write the file.
+			if (function_exists('file_put_contents'))
+			{
+				$cache_bytes = @file_put_contents($cachedir . '/data_' . $key . '.php', $cache_data, LOCK_EX);
+				if ($cache_bytes != strlen($cache_data))
+					@unlink($cachedir . '/data_' . $key . '.php');
+			}
+			else
+			{
 				// Write the file.
 				if (function_exists('file_put_contents'))
 				{
 					$cache_bytes = @file_put_contents($cachedir . '/data_' . $key . '.php', $cache_data, LOCK_EX);
 					if ($cache_bytes != strlen($cache_data))
-						@unlink($cachedir . '/data_' . $key . '.php');
+					@unlink($cachedir . '/data_' . $key . '.php');
 				}
 				else
 				{
@@ -2724,11 +2767,19 @@ function cache_put_data($key, $value, $ttl = 120)
 							@unlink($cachedir . '/data_' . $key . '.php');
 					}
 				}
+			}
 		}
 	}
 
 	if (isset($db_show_debug) && $db_show_debug === true)
 		$cache_hits[$cache_count]['t'] = array_sum(explode(' ', microtime())) - array_sum(explode(' ', $st));
+
+	// Invalidate the opcode cache
+	if (function_exists('opcache_invalidate'))
+    	opcache_invalidate($cachedir . '/data_' . $key . '.php', true);
+
+	if (function_exists('apc_delete_file'))
+		@apc_delete_file($cachedir . '/data_' . $key . '.php');
 }
 
 function cache_get_data($key, $ttl = 120)

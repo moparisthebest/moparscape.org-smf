@@ -7,7 +7,7 @@
  * @copyright 2011 Simple Machines
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.0
+ * @version 2.0.10
  */
 
 // The main template for the post page.
@@ -583,7 +583,7 @@ function template_main()
 					}
 					// !!! Currently not sending poll options and option checkboxes.
 					var x = new Array();
-					var textFields = [\'subject\', ', JavaScriptEscape($context['post_box_name']), ', \'icon\', \'guestname\', \'email\', \'evtitle\', \'question\', \'topic\'];
+					var textFields = [\'subject\', ', JavaScriptEscape($context['post_box_name']), ', \'icon\', \'guestname\', \'email\', \'evtitle\', \'question\', \'topic\', ', JavaScriptEscape($context['session_var']), '];
 					var numericFields = [
 						\'board\', \'topic\', \'last_msg\',
 						\'eventid\', \'calendar\', \'year\', \'month\', \'day\',

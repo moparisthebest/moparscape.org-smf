@@ -8,7 +8,7 @@
  * @copyright 2011 Simple Machines
  * @license http://www.simplemachines.org/about/smf/license.php BSD
  *
- * @version 2.0.1
+ * @version 2.0.10
  */
 
 if (!defined('SMF'))
@@ -262,9 +262,6 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 			continue;
 		}
 
-		if ($current['type'] == 5 && substr($current['filename'], -1) != '/')
-			$current['filename'] .= '/';
-
 		foreach ($current as $k => $v)
 		{
 			if (in_array($k, $octdec))
@@ -272,6 +269,9 @@ function read_tgz_data($data, $destination, $single_file = false, $overwrite = f
 			else
 				$current[$k] = trim($v);
 		}
+
+		if ($current['type'] == 5 && substr($current['filename'], -1) != '/')
+			$current['filename'] .= '/';
 
 		$checksum = 256;
 		for ($i = 0; $i < 148; $i++)
@@ -515,6 +515,9 @@ function loadInstalledPackages()
 
 		$found[] = $row['package_id'];
 
+		// Clean things up first...
+		$row = htmlspecialchars__recursive($row);
+
 		$installed[] = array(
 			'id' => $row['id_install'],
 			'name' => $row['name'],
@@ -563,8 +566,19 @@ function getPackageInfo($gzfilename)
 	$packageInfo = $packageInfo->path('package-info[0]');
 
 	$package = $packageInfo->to_array();
+	$package = htmlspecialchars__recursive($package);
 	$package['xml'] = $packageInfo;
 	$package['filename'] = $gzfilename;
+
+	// Don't want to mess with code...
+	$types = array('install', 'uninstall', 'upgrade');
+	foreach($types as $type)
+	{
+		if (isset($package[$type]['code']))
+		{
+			$package[$type]['code'] = un_htmlspecialchars($package[$type]['code']);
+		}
+	}
 
 	if (!isset($package['type']))
 		$package['type'] = 'modification';
@@ -2443,7 +2457,7 @@ function package_get_contents($filename)
 	if (!isset($package_cache))
 	{
 		// Windows doesn't seem to care about the memory_limit.
-		if (!empty($modSettings['package_disable_cache']) || ini_set('memory_limit', '128M') !== false || strpos(strtolower(PHP_OS), 'win') !== false)
+		if (!empty($modSettings['package_disable_cache']) || @ini_set('memory_limit', '128M') !== false || strpos(strtolower(PHP_OS), 'win') !== false)
 			$package_cache = array();
 		else
 			$package_cache = false;
@@ -2463,7 +2477,7 @@ function package_put_contents($filename, $data, $testing = false)
 	if (!isset($package_cache))
 	{
 		// Try to increase the memory limit - we don't want to run out of ram!
-		if (!empty($modSettings['package_disable_cache']) || ini_set('memory_limit', '128M') !== false || strpos(strtolower(PHP_OS), 'win') !== false)
+		if (!empty($modSettings['package_disable_cache']) || @ini_set('memory_limit', '128M') !== false || strpos(strtolower(PHP_OS), 'win') !== false)
 			$package_cache = array();
 		else
 			$package_cache = false;

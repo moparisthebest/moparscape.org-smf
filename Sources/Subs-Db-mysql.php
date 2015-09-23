@@ -248,9 +248,9 @@ function smf_db_query($identifier, $db_string, $db_values = array(), $connection
 		'alter_table_boards' => array(
 			'~(.+)~' => '',
 		),
-		'boardindex_fetch_boards' => array(
-			'~(.)$~' => '$1 ORDER BY b.board_order',
-		),
+		//'boardindex_fetch_boards' => array(
+		//	'~(.)$~' => '$1 ORDER BY b.board_order',
+		//),
 		'messageindex_fetch_boards' => array(
 			'~(.)$~' => '$1 ORDER BY b.board_order',
 		),

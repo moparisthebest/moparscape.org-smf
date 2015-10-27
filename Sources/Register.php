@@ -274,7 +274,7 @@ function Register2($verifiedOpenID = false)
 	// Collect all extra registration fields someone might have filled in.
 	$possible_strings = array(
 		'website_url', 'website_title',
-		'aim', 'yim',
+		'aim', 'yim', 'skype', 'gtalk',
 		'location', 'birthdate',
 		'time_format',
 		'buddy_list',

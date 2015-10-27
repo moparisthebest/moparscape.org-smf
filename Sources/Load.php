@@ -949,7 +949,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			IFNULL(lo.log_time, 0) AS is_online, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
 			mem.signature, mem.personal_text, mem.location, mem.gender, mem.avatar, mem.id_member, mem.member_name,
 			mem.real_name, mem.email_address, mem.hide_email, mem.date_registered, mem.website_title, mem.website_url,
-			mem.birthdate, mem.member_ip, mem.member_ip2, mem.icq, mem.aim, mem.yim, mem.msn, mem.posts, mem.last_login,
+			mem.birthdate, mem.member_ip, mem.member_ip2, mem.icq, mem.aim, mem.yim, mem.msn, mem.posts, mem.last_login, mem.skype, mem.gtalk,
 			mem.karma_good, mem.id_post_group, mem.karma_bad, mem.lngfile, mem.id_group, mem.time_offset, mem.show_online,
 			mem.buddy_list, mg.online_color AS member_group_color, IFNULL(mg.group_name, {string:blank_string}) AS member_group,
 			pg.online_color AS post_group_color, IFNULL(pg.group_name, {string:blank_string}) AS post_group, mem.is_activated, mem.warning,
@@ -967,7 +967,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 			IFNULL(lo.log_time, 0) AS is_online, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
 			mem.signature, mem.personal_text, mem.location, mem.gender, mem.avatar, mem.id_member, mem.member_name,
 			mem.real_name, mem.email_address, mem.hide_email, mem.date_registered, mem.website_title, mem.website_url,
-			mem.openid_uri, mem.birthdate, mem.icq, mem.aim, mem.yim, mem.msn, mem.posts, mem.last_login, mem.karma_good,
+			mem.openid_uri, mem.birthdate, mem.icq, mem.aim, mem.yim, mem.msn, mem.posts, mem.last_login, mem.karma_good, mem.skype, mem.gtalk,
 			mem.karma_bad, mem.member_ip, mem.member_ip2, mem.lngfile, mem.id_group, mem.id_theme, mem.buddy_list,
 			mem.pm_ignore_list, mem.pm_email_notify, mem.pm_receive_from, mem.time_offset' . (!empty($modSettings['titlesEnable']) ? ', mem.usertitle' : '') . ',
 			mem.time_format, mem.secret_question, mem.is_activated, mem.additional_groups, mem.smiley_set, mem.show_online,
@@ -1211,6 +1211,18 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'link' => '<a class="aim" href="aim:goim?screenname=' . urlencode(strtr($profile['aim'], array(' ' => '%20'))) . '&amp;message=' . $txt['aim_default_message'] . '" title="' . $txt['aim_title'] . ' - ' . $profile['aim'] . '"><img src="' . $settings['images_url'] . '/aim.gif" alt="' . $txt['aim_title'] . ' - ' . $profile['aim'] . '" /></a>',
 			'link_text' => '<a class="aim" href="aim:goim?screenname=' . urlencode(strtr($profile['aim'], array(' ' => '%20'))) . '&amp;message=' . $txt['aim_default_message'] . '" title="' . $txt['aim_title'] . ' - ' . $profile['aim'] . '">' . $profile['aim'] . '</a>'
 		) : array('name' => '', 'href' => '', 'link' => '', 'link_text' => ''),
+		'skype' => $profile['skype'] !='' && (empty($modSettings['guest_hideContacts']) || !$user_info['is_guest']) ? array(
+			'name' => &$profile['skype'],
+			'href' => 'skype:'.$profile['skype'].'?userinfo',
+			'link' => '<a href="skype:' . $profile['skype'] . '?userinfo" target="_blank" title="' . $txt['skype'] . ' - ' . $profile['skype'] . '"><img src="' . (empty($settings['skype_image']) ? 'http://mystatus.skype.com/smallicon/' . $profile['skype'] : $settings['images_url'] . '/skype.gif') . '" title="' . $txt['skype'] . ' - ' . $profile['skype'] . '" border="0" /></a>',
+			'link_text' => '<a href="skype:' . $profile['skype'] . '?userinfo" target="_blank" title="' . $txt['skype'] . ' - ' . $profile['skype'] . '">' . $profile['skype'] . '</a>'
+		) : array('name' => '', 'href' => '', 'link' => '', 'link_text' => ''),
+		'gtalk' => $profile['gtalk'] !='' && (empty($modSettings['guest_hideContacts']) || !$user_info['is_guest']) ? array(
+			'name' => $profile['gtalk'],
+			'href' => 'mailto:'.$profile['gtalk'],
+			'link' => '<a href="mailto:' . $profile['gtalk'] . '" target="_blank" title="' . $txt['gtalk'] . ' - ' . $profile['gtalk'] . '"><img src="' . $settings['images_url'] . '/gtalk.gif" alt="' . $txt['gtalk'] . '" border="0" /></a>',
+			'link_text' => '<a href="mailto:' . $profile['gtalk'] . '" target="_blank" title="' . $txt['gtalk'] . ' - ' . $profile['gtalk'] . '">' . $profile['gtalk'] . '</a>'
+		) : array('name' => '', 'href' => '', 'link' => '', 'link_text' => ''),
 		'yim' => $profile['yim'] != '' && (empty($modSettings['guest_hideContacts']) || !$user_info['is_guest']) ? array(
 			'name' => $profile['yim'],
 			'href' => 'http://edit.yahoo.com/config/send_webmesg?.target=' . urlencode($profile['yim']),
@@ -1271,7 +1283,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 
 	// First do a quick run through to make sure there is something to be shown.
 	$memberContext[$user]['has_messenger'] = false;
-	foreach (array('icq', 'msn', 'aim', 'yim') as $messenger)
+	foreach (array('icq', 'msn', 'aim', 'yim', 'skype', 'gtalk') as $messenger)
 	{
 		if (!isset($context['disabled_fields'][$messenger]) && !empty($memberContext[$user][$messenger]['link']))
 		{

@@ -103,6 +103,16 @@ function template_main()
 		if (!isset($context['disabled_fields']['msn']))
 			echo '
 					<td class="windowbg2">', $member['msn']['link'], '</td>';
+			
+		// Skype?
+		if (!isset($context['disabled_fields']['skype']))
+			echo '
+					<td class="windowbg2">', $member['skype']['link'], '</td>';
+					
+		// GoogleTalk?
+		if (!isset($context['disabled_fields']['gtalk']))
+			echo '
+					<td class="windowbg2">', $member['gtalk']['link'], '</td>';
 
 		// Group and date.
 		echo '

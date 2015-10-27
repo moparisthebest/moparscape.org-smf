@@ -763,6 +763,22 @@ function loadProfileFields($force_reload = false)
 			'input_attr' => array('maxlength="32"'),
 			'permission' => 'profile_extra',
 		),
+		'skype' => array(
+			'type' => 'text',
+			'label' => $txt['skype'],
+			'subtext' => $txt['your_skype'],
+			'size' => 24,
+			'input_attr' => array('maxlength="32"'),
+			'permission' => 'profile_extra',
+		),
+		'gtalk' => array(
+			'type' => 'text',
+			'label' => $txt['gtalk'],
+			'subtext' => $txt['your_gtalk'],
+			'size' => 24,
+			'input_attr' => array('maxlength="32"'),
+			'permission' => 'profile_extra',
+		),
 	);
 
 	$disabled_fields = !empty($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
@@ -1701,7 +1717,7 @@ function forumProfile($memID)
 		array(
 			'avatar_choice', 'hr', 'personal_text', 'hr',
 			'bday1', 'location', 'gender', 'hr',
-			'icq', 'aim', 'msn', 'yim', 'hr',
+			'icq', 'aim', 'msn', 'yim', 'skype', 'gtalk', 'hr',
 			'usertitle', 'signature', 'hr',
 			'karma_good', 'hr',
 			'website_title', 'website_url',

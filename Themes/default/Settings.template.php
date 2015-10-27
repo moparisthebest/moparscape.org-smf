@@ -247,6 +247,10 @@ function template_settings()
 			'label' => $txt['show_view_profile_button'],
 		),
 		array(
+			'id' => 'skype_image',
+			'label' => $txt['skype_static_image'],			
+		),
+		array(
 			'id' => 'show_user_images',
 			'label' => $txt['user_avatars'],
 		),

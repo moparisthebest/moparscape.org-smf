@@ -355,6 +355,8 @@ function template_main()
 										', !empty($message['member']['msn']['link']) ? '<li>' . $message['member']['msn']['link'] . '</li>' : '', '
 										', !empty($message['member']['aim']['link']) ? '<li>' . $message['member']['aim']['link'] . '</li>' : '', '
 										', !empty($message['member']['yim']['link']) ? '<li>' . $message['member']['yim']['link'] . '</li>' : '', '
+										', !isset($context['disabled_fields']['skype']) && !empty($message['member']['skype']['link']) ? '<li>' . $message['member']['skype']['link'] . '</li>' : '', '
+										', !isset($context['disabled_fields']['gtalk']) && !empty($message['member']['gtalk']['link']) ? '<li>' . $message['member']['gtalk']['link'] . '</li>' : '', '
 									</ul>
 								</li>';
 

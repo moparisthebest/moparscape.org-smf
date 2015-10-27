@@ -936,6 +936,10 @@ function getXmlProfile($xml_format)
 			$data['msn'] = $profile['msn']['name'];
 		if ($profile['yim']['name'] != '' && !(!empty($modSettings['guest_hideContacts']) && $user_info['is_guest']))
 			$data['yim'] = $profile['yim']['name'];
+		if ($profile['skype']['name'] != '' && !(!empty($modSettings['guest_hideContacts']) && $user_info['is_guest']))
+			$data['skype'] = $profile['skype']['name'];
+		if ($profile['gtalk']['name'] != '' && !(!empty($modSettings['guest_hideContacts']) && $user_info['is_guest']))
+			$data['gtalk'] = $profile['gtalk']['name'];
 
 		if ($profile['website']['title'] != '')
 			$data['website'] = array(

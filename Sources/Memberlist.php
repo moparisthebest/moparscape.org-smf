@@ -109,6 +109,14 @@ function Memberlist()
 			'label' => $txt['msn'],
 			'width' => '30'
 		),
+		'skype' => array(
+			'label' => $txt['skype'],
+			'width' => '30'
+		),
+		'gtalk' => array(
+			'label' => $txt['gtalk1'],
+			'width' => '30'
+		),
 		'id_group' => array(
 			'label' => $txt['position']
 		),
@@ -321,6 +329,14 @@ function MLAll()
 			'down' => 'LENGTH(mem.msn) > 0 ASC, IFNULL(mem.msn, 1=1) DESC, mem.msn DESC',
 			'up' => 'LENGTH(mem.msn) > 0 DESC, IFNULL(mem.msn, 1=1) ASC, mem.msn ASC'
 		),
+		'skype' => array(
+			'down' => 'LENGTH(mem.skype) > 0 ASC, IFNULL(mem.skype, 1=1) DESC, mem.skype DESC',
+			'up' => 'LENGTH(mem.skype) > 0 DESC, IFNULL(mem.skype, 1=1) ASC, mem.skype ASC'
+		),
+		'gtalk' => array(
+			'down' => 'LENGTH(mem.gtalk) > 0 ASC, IFNULL(mem.gtalk, 1=1) DESC, mem.gtalk DESC',
+			'up' => 'LENGTH(mem.gtalk) > 0 DESC, IFNULL(mem.gtalk, 1=1) ASC, mem.gtalk ASC'
+		),
 		'registered' => array(
 			'down' => 'mem.date_registered DESC',
 			'up' => 'mem.date_registered ASC'
@@ -460,7 +476,7 @@ function MLSearch()
 			$fields = array();
 		// Search for messengers...
 		if (in_array('messenger', $_POST['fields']) && (!$user_info['is_guest'] || empty($modSettings['guest_hideContacts'])))
-			$fields += array(3 => 'msn', 'aim', 'icq', 'yim');
+			$fields += array(3 => 'msn', 'aim', 'icq', 'yim', 'skype', 'gtalk';
 		// Search for websites.
 		if (in_array('website', $_POST['fields']))
 			$fields += array(7 => 'website_title', 'website_url');

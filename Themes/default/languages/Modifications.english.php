@@ -32,4 +32,11 @@ $txt['spoiler_tag_onbuttonclickshow'] = 'Show on Button Click';
 $txt['spoiler_tag_label'] = 'Spoiler Mode';
 $txt['spoiler_tag_desc'] = 'Choose how spoilers will display on the theme.';
 $txt['spoiler_tag_default'] = '(use global default spoiler mode)';
+$txt['gtalk'] = 'Google Talk';
+$txt['your_gtalk'] = 'This is your GTalk address.';
+$txt['gtalk1'] = 'G-Talk';
+$txt['skype'] = 'Skype';
+$txt['your_skype'] = 'This is your Skype username.';
+$txt['skype_static_image'] = 'Show static skype icon.<br>(unchecked will show member skype activity details)';
+
 ?>

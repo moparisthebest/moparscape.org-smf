@@ -419,7 +419,7 @@ function template_ssi_above()
 	<head>
 		<title>SMF 2.0 SSI.php Examples</title>
 		<link rel="stylesheet" type="text/css" href="', $settings['default_theme_url'], '/css/index.css?fin20" />
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
+		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js?fin21"></script>
 		<style type="text/css">
 			#wrapper
 			{

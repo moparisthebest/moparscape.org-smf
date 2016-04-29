@@ -101,7 +101,7 @@ function template_html_above()
 
 	// Here comes the JavaScript bits!
 	echo '
-	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js?fin20"></script>
+	<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js?fin21"></script>
 	<script type="text/javascript" src="', $settings['theme_url'], '/scripts/theme.js?fin20"></script>
 	<script type="text/javascript"><!-- // --><![CDATA[
 		var smf_theme_url = "', $settings['theme_url'], '";

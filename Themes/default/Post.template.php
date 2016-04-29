@@ -919,7 +919,7 @@ function template_spellcheck()
 			var spell_fieldname = window.opener.spell_fieldname;
 		// ]]></script>
 		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/spellcheck.js"></script>
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
+		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js?fin21"></script>
 		<script type="text/javascript"><!-- // --><![CDATA[
 			', $context['spell_js'], '
 		// ]]></script>
@@ -958,7 +958,7 @@ function template_quotefast()
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=', $context['character_set'], '" />
 		<title>', $txt['retrieving_quote'], '</title>
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
+		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js?fin21"></script>
 	</head>
 	<body>
 		', $txt['retrieving_quote'], '

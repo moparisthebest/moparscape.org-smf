@@ -22,7 +22,7 @@ function template_popup()
 		<meta name="robots" content="noindex" />
 		<title>', $context['page_title'], '</title>
 		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/index.css" />
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
+		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js?fin21"></script>
 	</head>
 	<body id="help_popup">
 		<div class="windowbg description">
@@ -45,7 +45,7 @@ function template_find_members()
 		<meta http-equiv="Content-Type" content="text/html; charset=', $context['character_set'], '" />
 		<meta name="robots" content="noindex" />
 		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/index.css" />
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js"></script>
+		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/script.js?fin21"></script>
 		<script type="text/javascript"><!-- // --><![CDATA[
 			var membersAdded = [];
 			function addMember(name)

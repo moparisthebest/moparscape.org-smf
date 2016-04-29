@@ -622,6 +622,7 @@ function loadProfileFields($force_reload = false)
 			'value' => '',
 			'permission' => 'profile_identity',
 			'input_validate' => create_function('&$value', '
+				global $sourcedir;
 				require_once($sourcedir . \'/scrypt.php\');
 				$value = $value != \'\' ? Password::hash(md5($value)) : \'\';
 				return true;

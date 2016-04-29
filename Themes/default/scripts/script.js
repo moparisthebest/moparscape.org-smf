@@ -634,7 +634,7 @@ function hashLoginPassword(doForm, cur_session_id)
 	if (!('opera' in window))
 		doForm.passwrd.autocomplete = 'off';
 
-	doForm.hash_passwrd.value = hex_sha1(hex_sha1(doForm.user.value.php_to8bit().php_strtolower() + doForm.passwrd.value.php_to8bit()) + cur_session_id);
+	doForm.hash_passwrd.value = hex_sha1(doForm.user.value.php_to8bit().php_strtolower() + doForm.passwrd.value.php_to8bit());
 
 	// It looks nicer to fill it with asterisks, but Firefox will try to save that.
 	if (is_ff != -1)
@@ -652,7 +652,8 @@ function hashAdminPassword(doForm, username, cur_session_id)
 	if (typeof(hex_sha1) == 'undefined')
 		return;
 
-	doForm.admin_hash_pass.value = hex_sha1(hex_sha1(username.php_to8bit().php_strtolower() + doForm.admin_pass.value.php_to8bit()) + cur_session_id);
+	doForm.admin_hash_pass.value = hex_sha1(username.php_to8bit().php_strtolower() + doForm.admin_pass.value.php_to8bit());
+
 	doForm.admin_pass.value = doForm.admin_pass.value.replace(/./g, '*');
 }
 

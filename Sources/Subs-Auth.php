@@ -582,6 +582,9 @@ function resetPassword($memID, $username = null)
 	$newPassword = substr(preg_replace('/\W/', '', md5(mt_rand())), 0, 10);
 	$newPassword_sha1 = sha1(strtolower($user) . $newPassword);
 
+	require_once($sourcedir . '/scrypt.php');
+	$newPassword_sha1 = Password::hash($newPassword_sha1);
+
 	// Do some checks on the username if needed.
 	if ($username !== null)
 	{

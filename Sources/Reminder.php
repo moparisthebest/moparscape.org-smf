@@ -260,7 +260,8 @@ function setPassword2()
 	validatePasswordFlood($_POST['u'], $flood_value, true);
 
 	// User validated.  Update the database!
-	updateMemberData($_POST['u'], array('validation_code' => '', 'passwd' => sha1(strtolower($username) . $_POST['passwrd1'])));
+	require_once($sourcedir . '/scrypt.php');
+	updateMemberData($_POST['u'], array('validation_code' => '', 'passwd' => Password::hash(sha1(strtolower($username) . $_POST['passwrd1']))));
 
 	call_integration_hook('integrate_reset_pass', array($username, $username, $_POST['passwrd1']));
 
@@ -348,7 +349,8 @@ function SecretAnswer2()
 	$smcFunc['db_free_result']($request);
 
 	// Check if the secret answer is correct.
-	if ($row['secret_question'] == '' || $row['secret_answer'] == '' || md5($_POST['secret_answer']) != $row['secret_answer'])
+	require_once($sourcedir . '/scrypt.php');
+	if ($row['secret_question'] == '' || $row['secret_answer'] == '' || !Password::check(md5($_POST['secret_answer']), $row['secret_answer']))
 	{
 		log_error(sprintf($txt['reminder_error'], $row['member_name']), 'user');
 		fatal_lang_error('incorrect_answer', false);
@@ -379,7 +381,8 @@ function SecretAnswer2()
 		fatal_lang_error('profile_error_password_' . $passwordError, false);
 
 	// Alright, so long as 'yer sure.
-	updateMemberData($row['id_member'], array('passwd' => sha1(strtolower($row['member_name']) . $_POST['passwrd1'])));
+	require_once($sourcedir . '/scrypt.php');
+	updateMemberData($row['id_member'], array('passwd' => Password::hash(sha1(strtolower($row['member_name']) . $_POST['passwrd1']))));
 
 	call_integration_hook('integrate_reset_pass', array($row['member_name'], $row['member_name'], $_POST['passwrd1']));
 

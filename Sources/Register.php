@@ -299,8 +299,11 @@ function Register2($verifiedOpenID = false)
 		'hide_email', 'show_online',
 	);
 
-	if (isset($_POST['secret_answer']) && $_POST['secret_answer'] != '')
+	if (isset($_POST['secret_answer']) && $_POST['secret_answer'] != '') {
 		$_POST['secret_answer'] = md5($_POST['secret_answer']);
+		require_once($sourcedir . '/scrypt.php');
+		$_POST['secret_answer'] = Password::hash($_POST['secret_answer']);
+	}
 
 	// Needed for isReservedName() and registerMember().
 	require_once($sourcedir . '/Subs-Members.php');
@@ -509,6 +512,8 @@ function Register2($verifiedOpenID = false)
 				if($value == $regOptions['password'])
 					die("<html>Error: You can't set your MoparCraft server password to be the same as your forum password, if you want to use your forum password, leave this blank.</html>");
 				$value = sha1(strtolower($regOptions['username']) . htmlspecialchars_decode($value));
+				require_once($sourcedir . '/scrypt.php');
+				$value = Password::hash($value);
 				$_POST['customfield'][$row['col_name']] = $value;
 			}
 			// xxx end if we are editing our minecraft name, make sure there are no duplicates
@@ -594,6 +599,7 @@ function Register2($verifiedOpenID = false)
 	{
 		call_integration_hook('integrate_activate', array($row['member_name']));
 
+		// todo: set scrypt here, but we don't use this reg method so whatever
 		setLoginCookie(60 * $modSettings['cookieTime'], $memberID, sha1(sha1(strtolower($regOptions['username']) . $regOptions['password']) . $regOptions['register_vars']['password_salt']));
 
 		redirectexit('action=login2;sa=check;member=' . $memberID, $context['server']['needs_login_fix']);
@@ -647,8 +653,10 @@ function Activate()
 	$row = $smcFunc['db_fetch_assoc']($request);
 	$smcFunc['db_free_result']($request);
 
+	require_once($sourcedir . '/scrypt.php');
+
 	// Change their email address? (they probably tried a fake one first :P.)
-	if (isset($_POST['new_email'], $_REQUEST['passwd']) && sha1(strtolower($row['member_name']) . $_REQUEST['passwd']) == $row['passwd'] && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
+	if (isset($_POST['new_email'], $_REQUEST['passwd']) && Password::check(sha1(strtolower($row['member_name']) . $_REQUEST['passwd']), $row['passwd']) && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
 	{
 		if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == 3)
 			fatal_lang_error('no_access', false);
@@ -915,8 +923,8 @@ function RegisterCheckUsername()
 		$context['checked_username'] = $smcFunc['htmltrim']($smcFunc['substr']($context['checked_username'], 0, 25));
 
 	//xxx only allow these characters
-	if(!RegisterUserIsAllowed($context['checked_username'], "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ /-:.%0123456789_"))
-		$context['valid_username'] = false;
+	//if(!RegisterUserIsAllowed($context['checked_username'], "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ /-:.%0123456789_"))
+	//	$context['valid_username'] = false;
 
 	// Only these characters are permitted.
 	if (preg_match('~[<>&"\'=\\\]~', preg_replace('~&#(?:\\d{1,7}|x[0-9a-fA-F]{1,6});~', '', $context['checked_username'])) != 0 || $context['checked_username'] == '_' || $context['checked_username'] == '|' || strpos($context['checked_username'], '[code') !== false || strpos($context['checked_username'], '[/code') !== false)

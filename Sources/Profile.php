@@ -510,7 +510,8 @@ function ModifyProfile($post_errors = array())
 				$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($cur_profile['member_name'], $_POST['oldpasswrd'], false)), true);
 
 				// Bad password!!!
-				if (!$good_password && $user_info['passwd'] != sha1(strtolower($cur_profile['member_name']) . $_POST['oldpasswrd']))
+				require_once($sourcedir . '/scrypt.php');
+				if (!$good_password && !Password::check(sha1(strtolower($cur_profile['member_name']) . $_POST['oldpasswrd']), $user_info['passwd']))
 					$post_errors[] = 'bad_password';
 
 				// Warn other elements not to jump the gun and do custom changes!

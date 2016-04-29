@@ -516,6 +516,10 @@ function loadProfileFields($force_reload = false)
 
 				// Set up the new password variable... ready for storage.
 				$value = sha1(strtolower($cur_profile[\'member_name\']) . un_htmlspecialchars($value));
+
+				require_once($sourcedir . \'/scrypt.php\');
+				$value = Password::hash($value);
+
 				return true;
 			'),
 		),
@@ -618,7 +622,8 @@ function loadProfileFields($force_reload = false)
 			'value' => '',
 			'permission' => 'profile_identity',
 			'input_validate' => create_function('&$value', '
-				$value = $value != \'\' ? md5($value) : \'\';
+				require_once($sourcedir . \'/scrypt.php\');
+				$value = $value != \'\' ? Password::hash(md5($value)) : \'\';
 				return true;
 			'),
 		),
@@ -1364,14 +1369,20 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 
 					//echo "success!"; exit;
 			}
-			if($area != 'register' && ($row['col_name'] == "cust_moparcr") && $value != '' && strlen($value) != 40 && (!isset($user_profile[$memID]['options'][$row['col_name']]) || $user_profile[$memID]['options'][$row['col_name']] != $value)){
+			if($area != 'register' && ($row['col_name'] == "cust_moparcr") && $value != '' && strlen($value) < 31 && (!isset($user_profile[$memID]['options'][$row['col_name']]) || $user_profile[$memID]['options'][$row['col_name']] != $value)){
 				//print_r($user_info);echo("--------------------------------------------------------------\n");print_r($user_profile);exit;
 				//die(strlen($value)."bob");
 				if(strlen($value) > 30)
 					die("<html>Error: Maximum length for MoparCraft server password is 30 characters.</html>");
 				$value = sha1(strtolower($user_profile[$memID]['member_name']) . htmlspecialchars_decode($value));
-				if($user_info['id'] == $memID && $value == $user_info['passwd'])
+
+				global $sourcedir;
+				require_once($sourcedir . '/scrypt.php');
+
+				if($user_info['id'] == $memID && Password::check($value, $user_info['passwd']))
 					die("<html>Error: You can't set your MoparCraft server password to be the same as your forum password, if you want to use your forum password, leave this blank.</html>");
+
+				$value = Password::hash($value);
 			}
 			//xxx end 
 		}
@@ -1862,10 +1873,17 @@ function authentication($memID, $saving = false)
 				// Go then.
 				$passwd = sha1(strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd1']));
 
+				require_once($sourcedir . '/scrypt.php');
+				$passwd = Password::hash($passwd);
+
 				// Do the important bits.
 				updateMemberData($memID, array('openid_uri' => '', 'passwd' => $passwd));
-				if ($context['user']['is_owner'])
-					setLoginCookie(60 * $modSettings['cookieTime'], $memID, sha1(sha1(strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2'])) . $cur_profile['password_salt']));
+
+				if ($context['user']['is_owner']) {
+					global $user_settings;
+					$user_settings['passwd'] = $passwd;
+					setLoginCookie(60 * $modSettings['cookieTime'], $memID, sha1($passwd . $cur_profile['password_salt']));
+				}
 
 				redirectexit('action=profile;u=' . $memID);
 			}
@@ -3086,7 +3104,9 @@ function profileReloadUser()
 	if (isset($_POST['passwrd2']) && $_POST['passwrd2'] != '')
 	{
 		require_once($sourcedir . '/Subs-Auth.php');
-		setLoginCookie(60 * $modSettings['cookieTime'], $context['id_member'], sha1(sha1(strtolower($cur_profile['member_name']) . un_htmlspecialchars($_POST['passwrd2'])) . $cur_profile['password_salt']));
+
+		global $user_settings;
+		setLoginCookie(60 * $modSettings['cookieTime'], $context['id_member'], sha1($user_settings['passwd'] . $cur_profile['password_salt']));
 	}
 
 	loadUserSettings();

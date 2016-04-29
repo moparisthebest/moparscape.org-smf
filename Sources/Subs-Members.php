@@ -676,6 +676,9 @@ function registerMember(&$regOptions, $return_errors = false)
 		'openid_uri' => (!empty($regOptions['openid']) ? $regOptions['openid'] : ''),
 	);
 
+	require_once($sourcedir . '/scrypt.php');
+	$regOptions['register_vars']['passwd'] = Password::hash($regOptions['register_vars']['passwd']);
+
 	// Setup the activation status on this new account so it is correct - firstly is it an under age account?
 	if ($regOptions['require'] == 'coppa')
 	{

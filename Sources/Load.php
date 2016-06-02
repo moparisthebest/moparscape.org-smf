@@ -1163,33 +1163,60 @@ function loadMemberContext($user, $display_custom_fields = false)
 	$profile['signature'] = parse_bbc($profile['signature'], true, 'sig' . $profile['id_member']);
 
 	$profile['is_online'] = (!empty($profile['show_online']) || allowedTo('moderate_forum')) && $profile['is_online'] > 0;
-	
+
 	// xxx changed for awards
 	// orig:
 	// $profile['stars'] = empty($profile['stars']) ? array('', '') : explode('#', $profile['stars']);
-	if(empty($profile['stars'])){
+	if (empty($profile['stars'])) {
 		$group_stars = '';
-	}else{
-		$stars = array();
-		$count = 0;
-		foreach (explode(';', $profile['stars']) as $star){
-			$star = explode('#', $star);
-			if($count == 0){ // original stars
-				$group_stars = str_repeat('<img src="' . str_replace('$language', $context['user']['language'], isset($star[1]) ? $settings['images_url'] . '/' . $star[1] : '') . '" alt="*" border="0" />', empty($star[0]) || empty($star[1]) ? 0 : $star[0]);
-			}else{ // awards
-				// # $star[0] is number of images
-				// but in this case, it specifies whether the award is to be shown
-				// on mitb.com, mscp.org, or both
-				// 1 = both, 2 = mscp, 3 = mitb
-				// otherwise it will be equal to $award_id
-				//if( ($star[0] == 1) || ($star[0] == 2 && defined('MSCP')) || ($star[0] == 3 && !defined('MSCP')) || $star[0] == $award_id)
-				$group_stars .= "</li>\n\t\t\t\t\t\t".'<li><img src="' . str_replace('$language', $context['user']['language'], isset($star[1]) ? $settings['images_url'] . '/' . $star[1] : '') . '" alt="*" border="0" />';
-			}
-			++$count;
+ 	} else {
+		$stars = explode(';', $profile['stars']);
+		$star = explode('#', $stars[0]);
+		$group_stars = str_repeat('<img src="' . str_replace('$language', $context['user']['language'], isset($star[1]) ? $settings['images_url'] . '/' . $star[1] : '') . '" alt="*" border="0" />', empty($star[0]) || empty($star[1]) ? 0 : $star[0]);
+		// Remove first element in $stars to get the badges.
+		array_shift($stars);
+		if (count($stars) > 0) {
+			$group_stars .= '</li><li><div style="overflow: auto;"><table>';
+			$count = 0;
+			// Change this as you see fit...
+			$badgeTooltips = array(
+				'c.png' => 'C Guru', 'onix.gif' => 'Web Developer', 'python.png' => 'Python Guru',
+				'csharp.png' => 'C# Guru', 'togepi.gif' => 'C++ Coder', 'lisp.png' => 'Lisp Guru',
+				'duke3d.gif' => 'Java Guru', 'Flare.gif' => 'Delphi Coder', 'Kakuna.gif' => 'VB Coder',
+				'SOTWWinner.png' => 'SOTW Winner', 'arccup.gif' => 'AutoRune Crew', 'batman.gif' => 'Batman',
+				'builder.png' => 'MoparCraft Builder', 'bulbasaur.gif' => 'MoparScape Moderator',
+				'caterpie.gif' => 'Programming Moderator', 'charmander.gif' => 'Other Moderator',
+				'codeguru.png' => 'Code Guru', 'dragonite.gif' => 'IRC Addict', 'dragonite.orig.gif' => 'IRC Legend',
+				'duke3dchristmas.gif' => 'Java Guru', 'irishbulbasaur.gif' => 'MoparScape Moderator',
+				'irishpika.gif' => 'Staff', 'javacoder.png' => 'Java Coder', 'lapras.gif' => 'Graphics Master',
+				'lpotm.png' => 'LPOTM Winner', 'mcwaward.png' => 'MoparScape MCW', 'mdgsharp.png' => 'GameDev Moderator',
+				'mgd_winner.gif' => 'GameDev Winner', 'moparcraft.gif' => 'MoparCraft Staff',
+				'moparcraft_admin.png' => 'MoparCraft Admin', 'persian.gif' => 'Games Moderator',
+				'pikaadmin.gif' => 'Administrator', 'pikagmod.gif' => 'Global Moderator',
+				'pikastaff.gif' => 'Staff', 'pikastaff36.gif' => 'Staff', 'pinan2.gif' => 'RS2 Moderator',
+				'pvper.gif' => 'Moparcraft PVPer', 'redstone_engineer.png' => 'Redstone Engineer',
+				'santabulbasaur.gif' => 'MoparScape Moderator', 'santapika.gif' => 'Staff', 'scarcup.gif' => 'Scar Scripter',
+				'scarmod.gif' => 'SCAR Moderator', 'simba.gif' => 'Simba Scripter', 'sotw.png' =>'SOTW Winner',
+				'spleef.png' => 'Spleef Champion', 'squirtle.gif' => 'Ex-Staff', 'srldev.gif' => 'SRL Developer',
+				'srldevold.gif' => 'SRL Developer', 'tutauth.png' => 'Tutorial Author', 'valentinemscpmod.png' => 'MoparScape Moderator',
+				'valentinepika.gif' => 'Staff', 'vulpex.gif' => 'General Moderator', 'yohelp.png' => 'Server Helper'
+			);
+			foreach ($stars as $badge) {
+		 		$badge = explode('#', $badge);
+				if ($count % 3 == 0)
+					$group_stars .= '<tr>';
+
+				$group_stars .= '<td><img src="' . str_replace('$language', $context['user']['language'], isset($badge[1]) ? $settings['images_url'] . '/' . $badge[1] : '') . '" alt="*" title="' . ((isset($badgeTooltips[$badge[1]])) ? $badgeTooltips[$badge[1]] : '') . '" border="0" /></td>';
+				$count++;
+				if ($count % 3 == 0)
+					$group_stars .= '</tr>';
+	 		}
+
+			$group_stars .= '</table></div></li>';
 		}
 	}
 	// xxx end changed for awards
-	
+
 	// Setup the buddy status here (One whole in_array call saved :P)
 	$profile['buddy'] = in_array($profile['id_member'], $user_info['buddies']);
 	$buddy_list = !empty($profile['buddy_list']) ? explode(',', $profile['buddy_list']) : array();
